@@ -1,0 +1,47 @@
+name: ISPW sync workflow
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: [self-hosted, win64]
+    # if need this 
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      Win_Topaz_Location: 'C:\Topaz\Workbench CLI'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+     
+      # sync step 2
+      - name: Sync step
+        uses: ./actions/ispw-sync-local
+        id: sync-local
+        with:
+          host: 'cw09.compuware.com'
+          port: 47623
+          uid: 'ISPWTPZ'
+          pass: ${{ secrets.ISPW_USER1_PWD }}
+          runtimeConfiguration: 'TPZP'
+          stream: 'PLAY'
+          application: 'PLAY'
+          checkoutLevel: 'DEV2'
+          gitUid: 'pfhyxs0'
+          gitPass: ${{ secrets.GIT_USER1_PWD }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          winTopazPath: ${{ env.Win_Topaz_Location }}
+          showEnv: false
+
