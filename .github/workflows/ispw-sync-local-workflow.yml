@@ -33,13 +33,13 @@ jobs:
         with:
           host: 'cw09.compuware.com'
           port: 47623
-          uid: 'ISPWTPZ'
+          uid: 'ISPWUser'
           pass: ${{ secrets.ISPW_USER1_PWD }}
           runtimeConfiguration: 'TPZP'
           stream: 'PLAY'
           application: 'PLAY'
           checkoutLevel: 'DEV2'
-          gitUid: 'pfhyxs0'
+          gitUid: 'gituser'
           gitPass: ${{ secrets.GIT_USER1_PWD }}
           token: ${{ secrets.GITHUB_TOKEN }}
           winTopazPath: ${{ env.Win_Topaz_Location }}
