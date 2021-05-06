@@ -1,8 +1,8 @@
 {
   "name": "ispw-sync-local",
   "version": "1.0.0",
-  "private": true,
   "description": "Action to sync ISPW source from a self-hosted runner, onto the mainframe.",
+  "publisher": "BMC Compuware",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
