@@ -1,5 +1,8 @@
 name: 'ispw-sync-local'
-description: 'ISPW Sync Local - GitHub Action running on self-hosted runners'
+description: 'Sync changesets to ISPW using local Topaz CLI'
+branding:
+  icon: upload-cloud
+  color: orange
 author: 'BMC'
 inputs:
   host:
