@@ -1,4 +1,4 @@
-# BMC Compuware ISPW Sync GitHub action
+# ispw-sync-local
 
 This action will load changed components into ISPW on the mainframe from self-hosted runners. The runners should install Topaz CLI and be able to access the ISPW host and port. This action supports Linux and Windows operating systems. 
 
