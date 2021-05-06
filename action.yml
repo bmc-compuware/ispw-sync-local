@@ -1,4 +1,4 @@
-name: 'ISPW Sync Local'
+name: 'ispw-sync-local'
 description: 'ISPW Sync Local - GitHub Action running on self-hosted runners'
 author: 'BMC'
 inputs:
