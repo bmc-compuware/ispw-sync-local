@@ -49,16 +49,13 @@ inputs:
     description: 'GIT user ID'
     required: true
   gitPass:
-    description: 'GIT password'
+    description: 'GIT password or GitHub PAT'
     required: true
   containerCreation:
     description: 'The option to indicate how often to create a new ISPW container'
     required: false
   containerDescription:
     description: 'The custom description to be used for the ISPW container'
-    required: false
-  token:
-    description: 'Token provided by GitHub'
     required: false
   winTopazPath:
     description: 'Topaz CLI installed path on Window based self-hosted runner'

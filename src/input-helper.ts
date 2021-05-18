@@ -108,9 +108,6 @@ export function getInputs(): IISPWSyncParms {
   result.showEnv =
     (core.getInput('showEnv') || 'false').toUpperCase() === 'TRUE'
 
-  // Auth token
-  result.authToken = core.getInput('token')
-
   // SHA?
   // if (result.ref.match(/^[0-9a-fA-F]{40}$/)) {
   //  result.commit = result.ref
@@ -121,9 +118,6 @@ export function getInputs(): IISPWSyncParms {
     ' Parsed the input arguments: ' +
     'application=' +
     result.application +
-    ', ' +
-    'authToken=' +
-    result.authToken +
     ', ' +
     'checkoutLevel =' +
     result.checkoutLevel +

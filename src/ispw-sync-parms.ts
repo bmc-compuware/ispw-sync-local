@@ -84,11 +84,6 @@ export interface IISPWSyncParms {
   showEnv: boolean
 
   /**
-   * The auth token to use with GitHub repository
-   */
-  authToken: string
-
-  /**
    * The Topaz CLI installed path on Window based self-hosted runner
    */
   winTopazPath: string

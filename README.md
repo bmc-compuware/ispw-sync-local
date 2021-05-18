@@ -5,7 +5,7 @@ This action will load changed components into ISPW on the mainframe from self-ho
 ## Table of Contents
 <!-- toc -->
 
-- [BMC Compuware ISPW Sync Local GitHub action](#bmccompuware-ispw-sync-local-github-action)
+- [ispw-sync-local](#ispw-sync-local)
   - [Table of Contents](#table-of-contents)
   - [Usage](#usage)
   - [Inputs](#inputs)
@@ -42,7 +42,6 @@ This action will load changed components into ISPW on the mainframe from self-ho
           checkoutLevel: 'DEV2'
           gitUid: 'GitUserId'
           gitPass: ${{ secrets.GIT_USER_PWD }}
-          token: ${{ secrets.GITHUB_TOKEN }}
           winTopazPath: ${{ Topaz_Location }}
           showEnv: true
 
@@ -65,10 +64,9 @@ This action will load changed components into ISPW on the mainframe from self-ho
 | `application` | **Required** | The ISPW server application. For example, `"PLAY"` |
 | `checkoutLevel` | **Required** | The ISPW server level. For example, `"DEV1"` |
 | `gitUid` | **Required** | The user name for the GIT repository. For example, `"gitfoo"` |
-| `gitPass` | **Required** | The password for the GIT repository. Please use secrets, such as, `${{ secrets.GITPASS }}` |
+| `gitPass` | **Required** | The password or GitHub PAT for the GIT repository. Please use secrets, such as, `${{ secrets.GITPASS }}` |
 | `containerCreation` | **Optional** | The option to indicate how often to create a new ISPW container (per-commit, per-branch). Default, `"per-commit"` |
 | `containerDescription` | **Optional** | The custom description to be used for the ISPW container. |
-| `token` |  **Optional** | GitHub Token provided by GitHub when using GitHub API to calculate the changed files. Set the value to ${{ secrets.GITHUB_TOKEN }}|
 | `winTopazPath` |  **Optional** | Topaz CLI installed path on Window based self-hosted runner. |
 | `unixTopazPath` |  **Optional** | Topaz CLI installed path on Unix based self-hosted runner. |
 | `showEnv` | **Optional** | Show value of environment variables for debugging. Possible values are `true` or `false` |
