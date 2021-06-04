@@ -395,7 +395,7 @@ function getInputs() {
     result.application = core.getInput('application', { required: true });
     result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
     result.gitUid = core.getInput('gitUid', { required: true });
-    result.gitPass = core.getInput('gitPass', { required: true });
+    result.gitToken = core.getInput('gitToken', { required: true });
     let repoUrl = process.env['GITHUB_REPOSITORY'];
     const repoServer = process.env['GITHUB_SERVER_URL'];
     if (!repoServer) {
@@ -480,8 +480,8 @@ function getInputs() {
         'gitCommit=' +
         result.gitCommit +
         ', ' +
-        'gitPass=' +
-        result.gitPass +
+        'gitToken=' +
+        result.gitToken +
         ', ' +
         'gitRepoUr=' +
         result.gitRepoUrl +
@@ -787,7 +787,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 '-gitUsername',
                 parms.gitUid,
                 '-gitPassword',
-                parms.gitPass,
+                parms.gitToken,
                 '-gitBranch',
                 parms.gitBranch,
                 '-gitFromHash',
