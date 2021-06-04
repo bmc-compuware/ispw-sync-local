@@ -40,8 +40,7 @@ jobs:
           application: 'PLAY'
           checkoutLevel: 'DEV2'
           gitUid: 'gituser'
-          gitPass: ${{ secrets.GIT_USER1_PWD }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          gitToken: ${{ secrets.GITHUB_TOKEN }}
           winTopazPath: ${{ env.Win_Topaz_Location }}
           showEnv: false
 

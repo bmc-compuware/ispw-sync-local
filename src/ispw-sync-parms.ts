@@ -66,7 +66,7 @@ export interface IISPWSyncParms {
   /**
    * GIT password
    */
-  gitPass: string
+  gitToken: string
 
   /**
    * The option to indicate how often to create a new ISPW container

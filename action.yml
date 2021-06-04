@@ -46,10 +46,10 @@ inputs:
     required: true
     default: 'DEV1'
   gitUid:
-    description: 'GIT user ID'
+    description: 'GitHub user ID'
     required: true
-  gitPass:
-    description: 'GIT password or GitHub PAT'
+  gitToken:
+    description: 'GitHub token, PAT or password'
     required: true
   containerCreation:
     description: 'The option to indicate how often to create a new ISPW container'
