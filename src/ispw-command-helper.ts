@@ -173,7 +173,7 @@ export async function execISPWSync(
       '-gitUsername',
       parms.gitUid,
       '-gitPassword',
-      parms.gitPass,
+      parms.gitToken,
       '-gitBranch',
       parms.gitBranch,
       '-gitFromHash',

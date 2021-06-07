@@ -5,7 +5,7 @@ import * as github from '@actions/github'
 export async function calculateChangedFiles(
   parms: IISPWSyncParms
 ): Promise<string> {
-  const gitHubToken = parms.authToken
+  const gitHubToken = parms.gitToken
 
   if (!gitHubToken) {
     throw new Error('GitHub Token is required')

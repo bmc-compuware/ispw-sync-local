@@ -46,7 +46,7 @@ export function getInputs(): IISPWSyncParms {
   result.checkoutLevel = core.getInput('checkoutLevel', {required: true})
 
   result.gitUid = core.getInput('gitUid', {required: true})
-  result.gitPass = core.getInput('gitPass', {required: true})
+  result.gitToken = core.getInput('gitToken', {required: true})
 
   let repoUrl = process.env['GITHUB_REPOSITORY']
   const repoServer = process.env['GITHUB_SERVER_URL']
@@ -108,9 +108,6 @@ export function getInputs(): IISPWSyncParms {
   result.showEnv =
     (core.getInput('showEnv') || 'false').toUpperCase() === 'TRUE'
 
-  // Auth token
-  result.authToken = core.getInput('token')
-
   // SHA?
   // if (result.ref.match(/^[0-9a-fA-F]{40}$/)) {
   //  result.commit = result.ref
@@ -121,9 +118,6 @@ export function getInputs(): IISPWSyncParms {
     ' Parsed the input arguments: ' +
     'application=' +
     result.application +
-    ', ' +
-    'authToken=' +
-    result.authToken +
     ', ' +
     'checkoutLevel =' +
     result.checkoutLevel +
@@ -146,8 +140,8 @@ export function getInputs(): IISPWSyncParms {
     'gitCommit=' +
     result.gitCommit +
     ', ' +
-    'gitPass=' +
-    result.gitPass +
+    'gitToken=' +
+    result.gitToken +
     ', ' +
     'gitRepoUr=' +
     result.gitRepoUrl +

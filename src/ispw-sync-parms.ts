@@ -66,7 +66,7 @@ export interface IISPWSyncParms {
   /**
    * GIT password
    */
-  gitPass: string
+  gitToken: string
 
   /**
    * The option to indicate how often to create a new ISPW container
@@ -82,11 +82,6 @@ export interface IISPWSyncParms {
    * Show environment variables for debug purpose
    */
   showEnv: boolean
-
-  /**
-   * The auth token to use with GitHub repository
-   */
-  authToken: string
 
   /**
    * The Topaz CLI installed path on Window based self-hosted runner
