@@ -64,7 +64,7 @@ This action will load changed components into ISPW on the mainframe from self-ho
 | `application` | **Required** | The ISPW server application. For example, `"PLAY"` |
 | `checkoutLevel` | **Required** | The ISPW server level. For example, `"DEV1"` |
 | `gitUid` | **Required** | The user name for the GIT repository. For example, `"gitfoo"` |
-| `gitToken` | **Required** | GitHub token, PAT or password for the GIT repository. Please use secrets, such as, `${{ secrets.GITHUB_TOKEN }}` |
+| `gitToken` | **Required** | GitHub token, PAT, or password when not using GitHub API to calculate the changed files. Please use secrets, such as,  `${{ secrets.GITHUB_TOKEN }}` |
 | `containerCreation` | **Optional** | The option to indicate how often to create a new ISPW container (per-commit, per-branch). Default, `"per-commit"` |
 | `containerDescription` | **Optional** | The custom description to be used for the ISPW container. |
 | `winTopazPath` |  **Optional** | Topaz CLI installed path on Window based self-hosted runner. |

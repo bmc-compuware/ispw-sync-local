@@ -49,7 +49,7 @@ inputs:
     description: 'GitHub user ID'
     required: true
   gitToken:
-    description: 'GitHub token, PAT or password'
+    description: 'GitHub token, PAT,  or password when not using GitHub API to calculate the changed files'
     required: true
   containerCreation:
     description: 'The option to indicate how often to create a new ISPW container'
