@@ -1,5 +1,5 @@
 name: 'ispw-sync-local'
-description: 'Sync changesets to ISPW using local Topaz CLI'
+description: 'Sync a changeset to the mainframe using ISPW local CLI'
 branding:
   icon: upload-cloud
   color: orange
