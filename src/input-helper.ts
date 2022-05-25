@@ -36,8 +36,9 @@ export function getInputs(): IISPWSyncParms {
   result.codePage = core.getInput('codePage')
   result.timeout = Number(core.getInput('timeout')).valueOf()
 
-  result.uid = core.getInput('uid', {required: true})
-  result.pass = core.getInput('pass', {required: true})
+  result.uid = core.getInput('uid', {required: false})
+  result.pass = core.getInput('pass', {required: false})
+  result.certificate = core.getInput('certificate', {required: false})
   result.runtimeConfiguration = core.getInput('runtimeConfiguration', {
     required: true
   })
@@ -145,11 +146,11 @@ export function getInputs(): IISPWSyncParms {
   encryptionProtocol=${result.encryptionProtocol},
   gitBranch=${result.gitBranch},
   gitCommit=${result.gitCommit},
-  gitToken=${result.gitToken},
   gitRepoUr=${result.gitRepoUrl},
   gitUid=${result.gitUid},
   host=${result.host},
   pass=${result.pass},
+  certificate=${result.certificate},
   port=${result.port},
   runtimeConfiguration=${result.runtimeConfiguration},
   showEnv=${result.showEnv},

@@ -35,6 +35,11 @@ export interface IISPWSyncParms {
   pass: string
 
   /**
+   * Client certificate
+   */
+  certificate: string
+
+  /**
    * Runtime configuration
    */
   runtimeConfiguration: string

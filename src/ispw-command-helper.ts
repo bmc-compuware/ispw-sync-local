@@ -160,10 +160,6 @@ export async function execISPWSync(
       parms.host,
       '-port',
       parms.port.toString(),
-      '-id',
-      parms.uid,
-      '-pass',
-      parms.pass,
       '-operation',
       'syncGitToIspw',
       '-ispwServerConfig',
@@ -191,6 +187,16 @@ export async function execISPWSync(
       '-gitLocalPath',
       parms.workspace
     ]
+
+    if (typeof parms.certificate != 'undefined' && parms.certificate) {
+      args.push('-certificate')
+      args.push(parms.certificate)
+    } else {
+      args.push('-id')
+      args.push(parms.uid)
+      args.push('-pass')
+      args.push(parms.pass)
+    }
 
     if (parms.timeout) {
       args.push('-timeout')
