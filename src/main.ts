@@ -1,31 +1,35 @@
 import * as core from '@actions/core'
 import {execISPWSync, getISPWCLIPath} from './ispw-command-helper'
-import {getInputs, validatePath} from './input-helper'
+import {getInputs} from './input-helper'
 import {existsSync, readFileSync} from 'fs'
 import * as path from 'path'
 async function run(): Promise<void> {
   try {
     const curWk = process.env.GITHUB_WORKSPACE
 
-    let parms = getInputs()
+    const parms = getInputs()
 
     let clipath = ''
     try {
       clipath = await getISPWCLIPath(parms)
     } catch (error) {
-      core.debug(`${error.message}`)
-      throw error
+      if (error instanceof Error) {
+        core.debug(`${error.message}`)
+        throw error
+      }
     }
 
     try {
       await execISPWSync(clipath, parms, curWk)
-    } catch (err) {
-      core.debug(`${err.message}`)
-      throw err
+    } catch (error) {
+      if (error instanceof Error) {
+        core.debug(`${error.message}`)
+        throw error
+      }
     }
 
     core.info('Setting up the output values')
-    let workpace: string = curWk ?? ''
+    const workpace: string = curWk ?? ''
 
     //Execution is completed
     try {
@@ -34,9 +38,11 @@ async function run(): Promise<void> {
         const dataStr = readFileSync(autoBuildParms).toString('utf8')
         core.setOutput('automaticBuildJson', dataStr)
       }
-    } catch (err) {
-      core.info(`Fail to read file: automaticBuildParams.txt`)
-      core.info(err.message)
+    } catch (error) {
+      if (error instanceof Error) {
+        core.info(`Fail to read file: automaticBuildParams.txt`)
+        core.info(error.message)
+      }
     }
 
     try {
@@ -45,14 +51,18 @@ async function run(): Promise<void> {
         const dataStr = readFileSync(changedProgs).toString('utf8')
         core.setOutput('changedProgramsJson', dataStr)
       }
-    } catch (err) {
-      core.info(`Fail to read file: changedPrograms.json`)
-      core.info(err.message)
+    } catch (error) {
+      if (error instanceof Error) {
+        core.info(`Fail to read file: changedPrograms.json`)
+        core.info(error.message)
+      }
     }
 
     core.info('ISPW Sync action is completed')
   } catch (error) {
-    core.setFailed(error.message)
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    }
   }
 }
 

@@ -19,12 +19,12 @@ export function getInputs(): IISPWSyncParms {
   try {
     fs.statSync(githubWorkspacePath)
   } catch (error) {
-    if (error.code === 'ENOENT') {
-      throw new Error(`Directory '${githubWorkspacePath}' does not exist`)
-    }
+    // if (error.message === 'ENOENT') {
+    //   throw new Error(`Directory '${githubWorkspacePath}' does not exist`)
+    // }
 
     throw new Error(
-      `Encountered an error when checking whether path '${githubWorkspacePath}' exists: ${error.message}`
+      `Encountered an error when checking whether path '${githubWorkspacePath}' exists`
     )
   }
 
@@ -114,125 +114,51 @@ export function getInputs(): IISPWSyncParms {
   //  result.ref = ''
   //}
 
-  let inputargs: string =
-    ' Parsed the input arguments: ' +
-    'application=' +
-    result.application +
-    ', ' +
-    'checkoutLevel =' +
-    result.checkoutLevel +
-    ', ' +
-    'codePage=' +
-    result.codePage +
-    ', ' +
-    'containerCreation=' +
-    result.containerCreation +
-    ', ' +
-    'containerDescription=' +
-    result.containerDescription +
-    ', ' +
-    'encryptionProtocol=' +
-    result.encryptionProtocol +
-    ', ' +
-    'gitBranch=' +
-    result.gitBranch +
-    ', ' +
-    'gitCommit=' +
-    result.gitCommit +
-    ', ' +
-    'gitToken=' +
-    result.gitToken +
-    ', ' +
-    'gitRepoUr=' +
-    result.gitRepoUrl +
-    ', ' +
-    'gitUid=' +
-    result.gitUid +
-    ', ' +
-    'host=' +
-    result.host +
-    ', ' +
-    'pass=' +
-    result.pass +
-    ', ' +
-    'port=' +
-    result.port +
-    ', ' +
-    'runtimeConfiguration=' +
-    result.runtimeConfiguration +
-    ', ' +
-    'showEnv=' +
-    result.showEnv +
-    ', ' +
-    'stream=' +
-    result.stream +
-    ', ' +
-    'application=' +
-    result.application +
-    ', ' +
-    'winTopazPath=' +
-    result.winTopazPath +
-    ', ' +
-    'workspace=' +
-    result.workspace
+  const inputargs = ` Parsed the input arguments: 
+    application= ${result.application},
+    checkoutLevel= ${result.checkoutLevel},
+    codePage= ${result.codePage},
+    containerCreation= ${result.containerCreation},
+    containerDescription=${result.containerDescription},
+    encryptionProtocol=${result.encryptionProtocol},
+    gitBranch=${result.gitBranch},
+    gitCommit=${result.gitCommit},
+    gitToken=${result.gitToken},
+    gitRepoUr=${result.gitRepoUrl},
+    gitUid=${result.gitUid},
+    host=${result.host},
+    pass=${result.pass},
+    port=${result.port},
+    runtimeConfiguration=${result.runtimeConfiguration},
+    showEnv=${result.showEnv},
+    stream=${result.stream},
+    application=${result.application},
+    winTopazPath=${result.winTopazPath},
+    workspace=${result.workspace}`
 
-  let logargs: string =
-    ' Parsed the input arguments: ' +
-    'application=' +
-    result.application +
-    ', ' +
-    'checkoutLevel =' +
-    result.checkoutLevel +
-    ', ' +
-    'codePage=' +
-    result.codePage +
-    ', ' +
-    'containerCreation=' +
-    result.containerCreation +
-    ', ' +
-    'containerDescription=' +
-    result.containerDescription +
-    ', ' +
-    'encryptionProtocol=' +
-    result.encryptionProtocol +
-    ', ' +
-    'gitBranch=' +
-    result.gitBranch +
-    ', ' +
-    'gitCommit=' +
-    result.gitCommit +
-    ', ' +
-    'gitRepoUr=' +
-    result.gitRepoUrl +
-    ', ' +
-    'gitUid=' +
-    result.gitUid +
-    ', ' +
-    'host=' +
-    result.host +
-    ', ' +
-    'port=' +
-    result.port +
-    ', ' +
-    'runtimeConfiguration=' +
-    result.runtimeConfiguration +
-    ', ' +
-    'showEnv=' +
-    result.showEnv +
-    ', ' +
-    'stream=' +
-    result.stream +
-    ', ' +
-    'application=' +
-    result.application +
-    ', ' +
-    'winTopazPath=' +
-    result.winTopazPath +
-    ', ' +
-    'workspace=' +
-    result.workspace
+  const logargs = ` Parsed the input arguments: 
+  application= ${result.application},
+  checkoutLevel= ${result.checkoutLevel},
+  codePage= ${result.codePage},
+  containerCreation= ${result.containerCreation},
+  containerDescription=${result.containerDescription},
+  encryptionProtocol=${result.encryptionProtocol},
+  gitBranch=${result.gitBranch},
+  gitCommit=${result.gitCommit},
+  gitToken=${result.gitToken},
+  gitRepoUr=${result.gitRepoUrl},
+  gitUid=${result.gitUid},
+  host=${result.host},
+  pass=${result.pass},
+  port=${result.port},
+  runtimeConfiguration=${result.runtimeConfiguration},
+  showEnv=${result.showEnv},
+  stream=${result.stream},
+  application=${result.application},
+  winTopazPath=${result.winTopazPath},
+  workspace=${result.workspace}`
 
-  core.debug('parsed input values: ' + inputargs)
+  core.debug(`parsed input values: ${inputargs}`)
 
   if (result.showEnv) {
     core.info(logargs)
@@ -244,12 +170,11 @@ export async function validatePath(aPath: string): Promise<void> {
   try {
     fs.statSync(aPath)
   } catch (error) {
-    if (error.code === 'ENOENT') {
-      throw new Error(`Directory '${aPath}' does not exist`)
-    }
-
+    // if (error.code === 'ENOENT') {
+    //   throw new Error(`Directory '${aPath}' does not exist`)
+    // }
     throw new Error(
-      `Encountered an error when checking whether path '${aPath}' exists: ${error.message}`
+      `Encountered an error when checking whether path '${aPath}' exists.`
     )
   }
 }

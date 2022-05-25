@@ -76,8 +76,8 @@ export async function calculateChangedFiles(
   }
 
   const options = {
-    owner: owner,
-    repo: repo,
+    owner,
+    repo,
     base: baseref,
     head: headref
   }
@@ -95,7 +95,7 @@ export async function calculateChangedFiles(
 
   if (files) {
     let fileNameStr = ''
-    const fileNames = files.map(files => files.filename.concat(':'))
+    const fileNames = files.map(f => f.filename.concat(':'))
 
     if (fileNames) {
       for (const afile of fileNames) {
