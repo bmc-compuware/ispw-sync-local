@@ -115,7 +115,7 @@ export function getInputs(): IISPWSyncParms {
   //  result.ref = ''
   //}
 
-  const inputargs = ` Parsed the input arguments: 
+  let inputargs = ` Parsed the input arguments: 
     application= ${result.application},
     checkoutLevel= ${result.checkoutLevel},
     codePage= ${result.codePage},
@@ -128,7 +128,6 @@ export function getInputs(): IISPWSyncParms {
     gitRepoUr=${result.gitRepoUrl},
     gitUid=${result.gitUid},
     host=${result.host},
-    pass=${result.pass},
     port=${result.port},
     runtimeConfiguration=${result.runtimeConfiguration},
     showEnv=${result.showEnv},
@@ -137,7 +136,7 @@ export function getInputs(): IISPWSyncParms {
     winTopazPath=${result.winTopazPath},
     workspace=${result.workspace}`
 
-  const logargs = ` Parsed the input arguments: 
+  let logargs = ` Parsed the input arguments: 
   application= ${result.application},
   checkoutLevel= ${result.checkoutLevel},
   codePage= ${result.codePage},
@@ -149,8 +148,6 @@ export function getInputs(): IISPWSyncParms {
   gitRepoUr=${result.gitRepoUrl},
   gitUid=${result.gitUid},
   host=${result.host},
-  pass=${result.pass},
-  certificate=${result.certificate},
   port=${result.port},
   runtimeConfiguration=${result.runtimeConfiguration},
   showEnv=${result.showEnv},
@@ -158,6 +155,14 @@ export function getInputs(): IISPWSyncParms {
   application=${result.application},
   winTopazPath=${result.winTopazPath},
   workspace=${result.workspace}`
+
+  if (typeof result.certificate != 'undefined' && result.certificate) {
+    inputargs = inputargs.concat(`${result.certificate}`)
+    logargs = logargs.concat(`${result.certificate}`)
+  } else {
+    inputargs = inputargs.concat(`${result.pass}`)
+    logargs = logargs.concat(`${result.pass}`)
+  }
 
   core.debug(`parsed input values: ${inputargs}`)
 
