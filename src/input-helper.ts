@@ -157,11 +157,15 @@ export function getInputs(): IISPWSyncParms {
   workspace=${result.workspace}`
 
   if (typeof result.certificate != 'undefined' && result.certificate) {
-    inputargs = inputargs.concat(`${result.certificate}`)
-    logargs = logargs.concat(`${result.certificate}`)
+    inputargs = `${inputargs},
+    certificate=${result.certificate}`
+    logargs = `${logargs},
+    certificate=${result.certificate}`
   } else {
-    inputargs = inputargs.concat(`${result.pass}`)
-    logargs = logargs.concat(`${result.pass}`)
+    inputargs = `${inputargs},
+    pass=${result.pass}`
+    logargs = `${logargs},
+    pass=${result.pass}`
   }
 
   core.debug(`parsed input values: ${inputargs}`)
