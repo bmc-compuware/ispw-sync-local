@@ -25,10 +25,13 @@ inputs:
     default: '0'
   uid: 
     description: 'Mainframe user ID'
-    required: true
+    required: false
   pass:
     description: 'Mainframe password'
-    required: true
+    required: false
+  certificate:
+    description: 'Client certificate'
+    required: false
   runtimeConfiguration:
     description: 'Runtime configuration'
     required: true

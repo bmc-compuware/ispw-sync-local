@@ -59,7 +59,7 @@ export async function execISPWSync(
       throw new Error(`Fail to get input values or environment settings`)
     }
 
-    let curWorkspace = parms.workspace
+    const curWorkspace = parms.workspace
 
     const configPath = path.join(curWorkspace, 'ispwcliwk')
     if (!existsSync(configPath)) {
@@ -77,7 +77,9 @@ export async function execISPWSync(
           unlinkSync(changedPrograms)
           core.info(`Remove obsolete file: ${changedPrograms}`)
         } catch (error) {
-          throw new Error(`Error: ${error.message}`)
+          if (error instanceof Error) {
+            throw new Error(`Error: ${error.message}`)
+          }
         }
       }
     } catch (error) {
@@ -92,7 +94,9 @@ export async function execISPWSync(
           unlinkSync(autoBuildParms)
           core.info('Remove obsolete file: ${autoBuildParms}')
         } catch (error) {
-          throw new Error(`Error: ${error.message}`)
+          if (error instanceof Error) {
+            throw new Error(`Error: ${error.message}`)
+          }
         }
       }
     } catch (error) {
@@ -107,7 +111,9 @@ export async function execISPWSync(
           unlinkSync(tempHash)
           core.info('Remove obsolete file: ${tempHash}')
         } catch (error) {
-          throw new Error(`Error: ${error?.message}`)
+          if (error instanceof Error) {
+            throw new Error(`Error: ${error?.message}`)
+          }
         }
       }
     } catch (error) {
@@ -139,7 +145,7 @@ export async function execISPWSync(
       return
     } else {
       if (changedFileList.length > 2048) {
-        var writeStream = createWriteStream(tempHash)
+        const writeStream = createWriteStream(tempHash)
         writeStream.write(changedFileList)
         writeStream.end()
       }
@@ -147,17 +153,13 @@ export async function execISPWSync(
 
     //-gitCommitFile
 
-    let args = [
+    const args = [
       '-data',
       configPath,
       '-host',
       parms.host,
       '-port',
       parms.port.toString(),
-      '-id',
-      parms.uid,
-      '-pass',
-      parms.pass,
       '-operation',
       'syncGitToIspw',
       '-ispwServerConfig',
@@ -185,6 +187,16 @@ export async function execISPWSync(
       '-gitLocalPath',
       parms.workspace
     ]
+
+    if (typeof parms.certificate != 'undefined' && parms.certificate) {
+      args.push('-certificate')
+      args.push(parms.certificate)
+    } else {
+      args.push('-id')
+      args.push(parms.uid)
+      args.push('-pass')
+      args.push(parms.pass)
+    }
 
     if (parms.timeout) {
       args.push('-timeout')
@@ -217,11 +229,13 @@ export async function execISPWSync(
 
     cwd = quoteArg(true, cwd)
     cliPath = quoteArg(true, cliPath)
-    core.debug('ISPW CLI parms: ' + parms)
+    core.debug(`ISPW CLI parms: ${parms}`)
 
     await exec(cliPath, args, {cwd})
   } catch (error) {
-    throw new Error(`Error: ${error.message}`)
+    if (error instanceof Error) {
+      throw new Error(`Error: ${error.message}`)
+    }
   }
 }
 

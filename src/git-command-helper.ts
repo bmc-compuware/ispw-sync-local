@@ -21,13 +21,13 @@ async function execGit(
     ignoreReturnCode: allowAllExitCodes,
     listeners: {
       stdout: (data: Buffer) => {
-        let outdata = data.toString()
+        const outdata = data.toString()
         stdout.push(outdata)
       }
     }
   }
 
-  core.debug('Execute git ' + gitPath + ' with ' + args + ', ' + options)
+  core.debug(`Execute git ${gitPath} with ${args}, ${options}`)
 
   result.exitCode = await exec.exec(gitPath, args, options)
   result.stdout = stdout.join('')
@@ -68,8 +68,7 @@ export async function calculateDiff(
     throw new Error('Fail to retrieve the GitHub context')
   }
 
-  let ref
-  ref = context.ref
+  const ref = context.ref
 
   let baseref
   let headref
@@ -82,7 +81,7 @@ export async function calculateDiff(
 
     baseref = context.payload.pull_request.base.sha
     headref = context.payload.pull_request.head.sha
-    let shas = baseref.concat('..').concat(headref)
+    const shas = baseref.concat('..').concat(headref)
 
     if (baseref && headref) {
       core.debug(
@@ -109,7 +108,7 @@ export async function calculateDiff(
         `Received GitHub information for push event: baseref= ${baseref}, headref= ${headref}`
       )
 
-      let shas = baseref.concat('..').concat(headref)
+      const shas = baseref.concat('..').concat(headref)
 
       args = ['diff', '--name-only', shas]
     } else if (ref) {
