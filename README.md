@@ -29,7 +29,7 @@ This action will load changed components into ISPW on the mainframe from self-ho
         uses: ./actions/ispw-sync-local
         id: sync-local
         with:
-          host: 'cw09.bmc.com'
+          host: 'host.example.com'
           port: 47623
           uid: 'ISPWUSER'
           pass: ${{ secrets.ISPW_USER1_PWD }}
