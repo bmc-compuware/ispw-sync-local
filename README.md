@@ -9,7 +9,7 @@ This action will load changed components into ISPW on the mainframe from self-ho
 - [Inputs](#inputs)
 - [Outputs](#outputs)
 - [Troubleshooting](#troubleshooting)
-- [License summary](LICENSE.txt)
+- [License](LICENSE.txt)
 
 <!-- tocstop -->
 
