@@ -5,14 +5,11 @@ This action will load changed components into ISPW on the mainframe from self-ho
 ## Table of Contents
 <!-- toc -->
 
-- [ispw-sync-local](#ispw-sync-local)
-  - [Table of Contents](#table-of-contents)
-  - [Usage](#usage)
-  - [Inputs](#inputs)
-  - [Outputs](#outputs)
-  - [Troubleshooting](#troubleshooting)
-  - [License summary](#license-summary)
-  - [Limitation](#limitation)
+- [Usage](#usage)
+- [Inputs](#inputs)
+- [Outputs](#outputs)
+- [Troubleshooting](#troubleshooting)
+- [License](LICENSE.txt)
 
 <!-- tocstop -->
 
@@ -32,7 +29,7 @@ This action will load changed components into ISPW on the mainframe from self-ho
         uses: ./actions/ispw-sync-local
         id: sync-local
         with:
-          host: 'cw09.compuware.com'
+          host: 'host.example.com'
           port: 47623
           uid: 'ISPWUSER'
           pass: ${{ secrets.ISPW_USER1_PWD }}
@@ -81,12 +78,3 @@ This action will load changed components into ISPW on the mainframe from self-ho
 ## Troubleshooting
 
 This action emits debug logs to help troubleshoot failure. To see the debug logs, set the input `showEnv: true`.
-
-## License summary
-
-This code is made available under the MIT license.
-
-## Limitation
-
-
-
