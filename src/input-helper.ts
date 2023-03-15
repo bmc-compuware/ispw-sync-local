@@ -44,6 +44,7 @@ export function getInputs(): IISPWSyncParms {
   })
   result.stream = core.getInput('stream', {required: true})
   result.application = core.getInput('application', {required: true})
+  result.subAppl = core.getInput('subAppl', {required: false})
   result.checkoutLevel = core.getInput('checkoutLevel', {required: true})
 
   result.gitUid = core.getInput('gitUid', {required: true})
@@ -117,6 +118,7 @@ export function getInputs(): IISPWSyncParms {
 
   let inputargs = ` Parsed the input arguments: 
     application= ${result.application},
+    subAppl= ${result.subAppl},
     checkoutLevel= ${result.checkoutLevel},
     codePage= ${result.codePage},
     containerCreation= ${result.containerCreation},
@@ -138,6 +140,7 @@ export function getInputs(): IISPWSyncParms {
 
   let logargs = ` Parsed the input arguments: 
   application= ${result.application},
+  subAppl= ${result.subAppl},
   checkoutLevel= ${result.checkoutLevel},
   codePage= ${result.codePage},
   containerCreation= ${result.containerCreation},
