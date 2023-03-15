@@ -9,6 +9,9 @@ async function run(): Promise<void> {
 
     const parms = getInputs()
 
+    core.info('Arrakis')
+    core.info(`Params: ${parms}`)
+
     let clipath = ''
     try {
       clipath = await getISPWCLIPath(parms)
