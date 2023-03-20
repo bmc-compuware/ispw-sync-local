@@ -47,7 +47,6 @@ inputs:
   subAppl:
     description: 'The ISPW Sub Application'
     required: false
-    default: 'PLAY'
   checkoutLevel:
     description: 'The test level to check components out to'
     required: true
