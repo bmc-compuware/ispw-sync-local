@@ -59,6 +59,7 @@ This action will load changed components into ISPW on the mainframe from self-ho
 | `runtimeConfiguration` | **Required** | The ISPW server config. For example, `"TPZP"` |
 | `stream` | **Required** | The ISPW server stream. For example, `"PLAY"` |
 | `application` | **Required** | The ISPW server application. For example, `"PLAY"` |
+| `subAppl` | **Optional** | The ISPW server sub application. For example, `"PLAY"` |
 | `checkoutLevel` | **Required** | The ISPW server level. For example, `"DEV1"` |
 | `gitUid` | **Required** | The user name for the GIT repository. For example, `"gitfoo"` |
 | `gitToken` | **Required** | GitHub token, PAT, or password when not using GitHub API to calculate the changed files. Please use secrets, such as,  `${{ secrets.GITHUB_TOKEN }}` |

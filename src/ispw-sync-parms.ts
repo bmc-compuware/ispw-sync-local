@@ -55,6 +55,11 @@ export interface IISPWSyncParms {
   application: string
 
   /**
+   * The ISPW Sub Application
+   */
+  subAppl: string
+
+  /**
    * The ISPW Application
    */
   checkoutLevel: string

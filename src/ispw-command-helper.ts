@@ -188,6 +188,11 @@ export async function execISPWSync(
       parms.workspace
     ]
 
+    if (parms.subAppl) {
+      args.push('-ispwServerSubAppl')
+      args.push(parms.subAppl)
+    }
+
     if (typeof parms.certificate != 'undefined' && parms.certificate) {
       args.push('-certificate')
       args.push(parms.certificate)
