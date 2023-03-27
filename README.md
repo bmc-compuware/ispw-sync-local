@@ -1,6 +1,6 @@
-# ispw-sync-local
+# code-pipeline-sync-local
 
-This action will load changed components into ISPW on the mainframe from self-hosted runners. The runners should install Topaz CLI and be able to access the ISPW host and port. This action supports Linux and Windows operating systems. 
+This action will load changed components into Code Pipeline on the mainframe from self-hosted runners. The runners should install Workbench CLI and be able to access the Code Pipeline host and port. This action supports Linux and Windows operating systems. 
 
 ## Table of Contents
 <!-- toc -->
@@ -19,7 +19,7 @@ This action will load changed components into ISPW on the mainframe from self-ho
 ```yaml
   job_sync:
     runs-on: [self-hosted, win64]
-    name: ISPW Sync on self-hosted runners
+    name: Code Pipeline Sync on self-hosted runners
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -49,24 +49,24 @@ This action will load changed components into ISPW on the mainframe from self-ho
 
 | Input name | Required | Description |
 | :--------- | :------- | :---------- |
-| `host` | **Required** | The ISPW server host. For example, `"cw09"` |
-| `port` | **Required** | The ISPW server port. For example, `47623` |
+| `host` | **Required** | The Code Pipeline server host. For example, `"cw09"` |
+| `port` | **Required** | The Code Pipeline server port. For example, `47623` |
 | `encryptionProtocol` | **Optional** | The encryption protocol for the connection (None, Auto, SSLv3, TLS, TLSv1, TLSv1.1, TLSv1.2). Default `"None"`
 | `codePage` | **Optional** | The code page for the connection. default, `1047` |
 | `timeout` | **Optional** | The timeout (in minutes) for the connection. Default, `0` |
-| `uid` | **Required** | The user name for the ISPW connection. For example, `"foo"` |
-| `pass` | **Required** | The password for the ISPW connection. Please use secrets, such as, `${{ secrets.ISPWPASS }}` |
-| `runtimeConfiguration` | **Required** | The ISPW server config. For example, `"TPZP"` |
-| `stream` | **Required** | The ISPW server stream. For example, `"PLAY"` |
-| `application` | **Required** | The ISPW server application. For example, `"PLAY"` |
-| `subAppl` | **Optional** | The ISPW server sub application. For example, `"PLAY"` |
-| `checkoutLevel` | **Required** | The ISPW server level. For example, `"DEV1"` |
+| `uid` | **Required** | The user name for the Code Pipeline connection. For example, `"foo"` |
+| `pass` | **Required** | The password for the Code Pipeline connection. Please use secrets, such as, `${{ secrets.ISPWPASS }}` |
+| `runtimeConfiguration` | **Required** | The Code Pipeline server config. For example, `"TPZP"` |
+| `stream` | **Required** | The Code Pipeline server stream. For example, `"PLAY"` |
+| `application` | **Required** | The Code Pipeline server application. For example, `"PLAY"` |
+| `subAppl` | **Optional** | The Code Pipeline server sub application. For example, `"PLAY"` |
+| `checkoutLevel` | **Required** | The Code Pipeline server level. For example, `"DEV1"` |
 | `gitUid` | **Required** | The user name for the GIT repository. For example, `"gitfoo"` |
 | `gitToken` | **Required** | GitHub token, PAT, or password when not using GitHub API to calculate the changed files. Please use secrets, such as,  `${{ secrets.GITHUB_TOKEN }}` |
-| `containerCreation` | **Optional** | The option to indicate how often to create a new ISPW container (per-commit, per-branch). Default, `"per-commit"` |
-| `containerDescription` | **Optional** | The custom description to be used for the ISPW container. |
-| `winTopazPath` |  **Optional** | Topaz CLI installed path on Window based self-hosted runner. |
-| `unixTopazPath` |  **Optional** | Topaz CLI installed path on Unix based self-hosted runner. |
+| `containerCreation` | **Optional** | The option to indicate how often to create a new Code Pipeline container (per-commit, per-branch). Default, `"per-commit"` |
+| `containerDescription` | **Optional** | The custom description to be used for the Code Pipeline container. |
+| `winTopazPath` |  **Optional** | Workbench CLI installed path on Window based self-hosted runner. |
+| `unixTopazPath` |  **Optional** | Workbench CLI installed path on Unix based self-hosted runner. |
 | `showEnv` | **Optional** | Show value of environment variables for debugging. Possible values are `true` or `false` |
 
 ## Outputs

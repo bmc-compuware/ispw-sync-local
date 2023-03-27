@@ -89,11 +89,11 @@ export function getInputs(): IISPWSyncParms {
   result.winTopazPath = core.getInput('winTopazPath')
   result.unixTopazPath = core.getInput('unixTopazPath')
 
-  // users need make sure Topaz CLI is installed at the same path
+  // users need make sure Workbench CLI is installed at the same path
 
   if (process.platform === 'win32') {
     if (!result.winTopazPath) {
-      throw new Error('Topaz CLI Path not defined')
+      throw new Error('Workbench CLI Path not defined')
     } else {
       validatePath(result.winTopazPath)
     }
@@ -101,7 +101,7 @@ export function getInputs(): IISPWSyncParms {
 
   if (process.platform === 'linux' || process.platform === 'sunos') {
     if (!result.unixTopazPath) {
-      throw new Error('Topaz CLI Path not defined')
+      throw new Error('Workbench CLI Path not defined')
     } else {
       validatePath(result.unixTopazPath)
     }

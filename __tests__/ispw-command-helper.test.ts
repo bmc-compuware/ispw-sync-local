@@ -23,7 +23,7 @@ test('quote a argument when it is not truthy ', async () => {
   await expect(quoteArg(true, input)).toBe('')
 })
 
-describe('Test ISPW SYNC', () => {
+describe('Test Code Pipeline SYNC', () => {
   let result = ({} as unknown) as IISPWSyncParms
 
   beforeEach(() => {
@@ -40,7 +40,7 @@ describe('Test ISPW SYNC', () => {
 
     result.winTopazPath = 'C:\\Topaz\\WorkbenchCLI11'
     result.unixTopazPath = 'opt\test'
-    // users need make sure Topaz CLI is installed at the same path
+    // users need make sure Workbench CLI is installed at the same path
 
     result.showEnv = true
   })

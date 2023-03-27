@@ -94,12 +94,12 @@ export interface IISPWSyncParms {
   showEnv: boolean
 
   /**
-   * The Topaz CLI installed path on Window based self-hosted runner
+   * The Workbench CLI installed path on Window based self-hosted runner
    */
   winTopazPath: string
 
   /**
-   * The Topaz CLI installed path on Linux/Sun Unix based self-hosted runner
+   * The Workbench CLI installed path on Linux/Sun Unix based self-hosted runner
    */
   unixTopazPath: string
 
