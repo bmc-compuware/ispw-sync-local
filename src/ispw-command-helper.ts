@@ -17,7 +17,7 @@ export async function getISPWCLIPath(parms: IISPWSyncParms): Promise<string> {
       topazCLIPath = path.join(topazCLIPath, 'IspwCLI.bat')
       topazCLIPath = path.normalize(topazCLIPath)
 
-      core.debug(`Topaz CLI Path: '${topazCLIPath}'`)
+      core.debug(`Workbench CLI Path: '${topazCLIPath}'`)
 
       if (existsSync(topazCLIPath)) {
         return topazCLIPath
@@ -32,7 +32,7 @@ export async function getISPWCLIPath(parms: IISPWSyncParms): Promise<string> {
       topazCLIPath = parms.unixTopazPath
       topazCLIPath = path.join(topazCLIPath, 'IspwCLI.sh')
       topazCLIPath = path.normalize(topazCLIPath)
-      core.debug(`Topaz CLI Path: ${topazCLIPath}`)
+      core.debug(`Workbench CLI Path: ${topazCLIPath}`)
       if (existsSync(topazCLIPath)) {
         return topazCLIPath
       } else {
@@ -234,7 +234,7 @@ export async function execISPWSync(
 
     cwd = quoteArg(true, cwd)
     cliPath = quoteArg(true, cliPath)
-    core.debug(`ISPW CLI parms: ${parms}`)
+    core.debug(`Code Pipeline CLI parms: ${parms}`)
 
     await exec(cliPath, args, {cwd})
   } catch (error) {

@@ -7701,7 +7701,7 @@
   function execISPWSync(cliPath, parms, cwd) {
       return __awaiter(this, void 0, void 0, function* () {
           try {
-              core.info('Start ISPW Sync action');
+              core.info('Start Code Pipeline Sync action');
               if (!parms || !cwd) {
                   core.debug('Fail to get input values or environment settings');
                   throw new Error(`Fail to get input values or environment settings`);
@@ -7997,7 +7997,7 @@
                       core.info(error.message);
                   }
               }
-              core.info('ISPW Sync action is completed');
+              core.info('Code Pipeline Sync action is completed');
           }
           catch (error) {
               if (error instanceof Error) {

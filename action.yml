@@ -1,5 +1,5 @@
-name: 'ispw-sync-local'
-description: 'Sync a changeset to the mainframe using ISPW local CLI'
+name: 'code-pipeline-sync-local'
+description: 'Sync a changeset to the mainframe using Code Pipeline local CLI'
 branding:
   icon: upload-cloud
   color: orange
@@ -37,15 +37,15 @@ inputs:
     required: true
     default: ''
   stream:
-    description: 'The ISPW Stream name'
+    description: 'The Code Pipeline Stream name'
     required: true
     default: 'PLAY'
   application:
-    description: 'The ISPW Application'
+    description: 'The Code Pipeline Application'
     required: true
     default: 'PLAY'
   subAppl:
-    description: 'The ISPW Sub Application'
+    description: 'The Code Pipeline Sub Application'
     required: false
   checkoutLevel:
     description: 'The test level to check components out to'
@@ -58,16 +58,16 @@ inputs:
     description: 'GitHub token, PAT,  or password when not using GitHub API to calculate the changed files'
     required: true
   containerCreation:
-    description: 'The option to indicate how often to create a new ISPW container'
+    description: 'The option to indicate how often to create a new Code Pipeline container'
     required: false
   containerDescription:
-    description: 'The custom description to be used for the ISPW container'
+    description: 'The custom description to be used for the Code Pipeline container'
     required: false
   winTopazPath:
-    description: 'Topaz CLI installed path on Window based self-hosted runner'
+    description: 'Workbench CLI installed path on Window based self-hosted runner'
     required: false
   unixTopazPath:
-    description: 'Topaz CLI installed path on Unix based self-hosted runner'
+    description: 'Workbench CLI installed path on Unix based self-hosted runner'
     required: false
   showEnv:
     description: 'Show environment variables for debug purpose'

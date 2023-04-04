@@ -1,8 +1,8 @@
 {
-  "name": "ispw-sync-local",
+  "name": "code-pipeline-sync-local",
   "version": "1.0.0",
-  "description": "Action to sync ISPW source from a self-hosted runner, onto the mainframe.",
-  "publisher": "BMC Compuware",
+  "description": "Action to sync Code Pipeline source from a self-hosted runner, onto the mainframe.",
+  "publisher": "BMC",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
