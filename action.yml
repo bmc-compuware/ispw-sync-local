@@ -1,4 +1,4 @@
-name: 'code-pipeline-sync-local'
+name: 'Code Pipeline Sync Local'
 description: 'Sync a changeset to the mainframe using Code Pipeline local CLI'
 branding:
   icon: upload-cloud

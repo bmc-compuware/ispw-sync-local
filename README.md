@@ -1,4 +1,4 @@
-# code-pipeline-sync-local
+# Code Pipeline Sync Local
 
 This action will load changed components into Code Pipeline on the mainframe from self-hosted runners. The runners should install Workbench CLI and be able to access the Code Pipeline host and port. This action supports Linux and Windows operating systems. 
 
