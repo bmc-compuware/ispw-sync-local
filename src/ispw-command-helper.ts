@@ -61,7 +61,7 @@ export async function execISPWSync(
 
     const curWorkspace = parms.workspace
 
-    const configPath = parms.ispwConfigPath != null ? parms.ispwConfigPath : path.join(curWorkspace, 'ispwcliwk')
+    const configPath = path.join(curWorkspace, 'ispwcliwk')
     if (!existsSync(configPath)) {
       await io.mkdirP(configPath)
     }
@@ -198,7 +198,8 @@ export async function execISPWSync(
       args.push(parms.assignmentPrefix)
     }
     if(parms.ispwConfigPath){
-      
+      args.push('-ispwConfigPath')
+      args.push(parms.ispwConfigPath)
     }
 
 
