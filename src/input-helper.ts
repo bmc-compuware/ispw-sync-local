@@ -138,7 +138,10 @@ export function getInputs(): IISPWSyncParms {
     stream=${result.stream},
     application=${result.application},
     winTopazPath=${result.winTopazPath},
-    workspace=${result.workspace}`
+    workspace=${result.workspace},
+    ispwConfigPath= ${result.ispwConfigPath},
+    assignmentPrefix = ${result.assignmentPrefix}
+    `
 
   let logargs = ` Parsed the input arguments: 
   application= ${result.application},
@@ -159,7 +162,9 @@ export function getInputs(): IISPWSyncParms {
   stream=${result.stream},
   application=${result.application},
   winTopazPath=${result.winTopazPath},
-  workspace=${result.workspace}`
+  workspace=${result.workspace},
+  ispwConfigPath= ${result.ispwConfigPath},
+  assignmentPrefix = ${result.assignmentPrefix}`
 
   if (typeof result.certificate != 'undefined' && result.certificate) {
     inputargs = `${inputargs},

@@ -193,6 +193,15 @@ export async function execISPWSync(
       args.push(parms.subAppl)
     }
 
+    if(parms.assignmentPrefix){
+      args.push('-assignmentPrefix')
+      args.push(parms.assignmentPrefix)
+    }
+    if(parms.ispwConfigPath){
+      
+    }
+
+
     if (typeof parms.certificate != 'undefined' && parms.certificate) {
       args.push('-certificate')
       args.push(parms.certificate)
