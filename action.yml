@@ -72,13 +72,7 @@ inputs:
   showEnv:
     description: 'Show environment variables for debug purpose'
     required: false
-   assignmentPrefix:
-    description: 'The prefix to be used for the Code Pipeline container'
-    required: false
-   ispwConfigPath: 
-    description: 'The path to Code Pipeline YAML configuration'
-    required: false
-outputs:
+ outputs:
   automaticBuildJson:
     description: 'The automatic build parameters JSON'
   changedProgramsJson:
