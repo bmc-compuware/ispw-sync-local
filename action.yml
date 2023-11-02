@@ -72,7 +72,7 @@ inputs:
   showEnv:
     description: 'Show environment variables for debug purpose'
     required: false
- outputs:
+outputs:
   automaticBuildJson:
     description: 'The automatic build parameters JSON'
   changedProgramsJson:
@@ -80,4 +80,3 @@ inputs:
 runs:
   using: 'node12'
   main: 'dist/index.js'
-
