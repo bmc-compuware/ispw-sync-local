@@ -68,6 +68,8 @@ This action will load changed components into Code Pipeline on the mainframe fro
 | `winTopazPath` |  **Optional** | Workbench CLI installed path on Window based self-hosted runner. |
 | `unixTopazPath` |  **Optional** | Workbench CLI installed path on Unix based self-hosted runner. |
 | `showEnv` | **Optional** | Show value of environment variables for debugging. Possible values are `true` or `false` |
+| `assignmentPrefix` | **Optional** | The prefix to be used for the Code Pipeline container. For example, `"PLAY"` |
+| `ispwConfigPath` | **Optional** | The path to Code Pipeline YAML configuration. For example, `"demo\ispwconfig.yml"` |
 
 ## Outputs
 
