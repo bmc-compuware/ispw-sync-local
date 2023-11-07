@@ -7566,13 +7566,13 @@
       application=${result.application},
       winTopazPath=${result.winTopazPath},
       workspace=${result.workspace},
-      ispwConfigPath=${result.ispwConfigPath}.
+      ispwConfigPath=${result.ispwConfigPath},
       assignmentPrefix=${result.assignmentPrefix}
       `;
       let logargs = ` Parsed the input arguments: 
     application= ${result.application},
     subAppl= ${result.subAppl},
-    ispwConfigPath=${result.ispwConfigPath}.
+    ispwConfigPath=${result.ispwConfigPath},
     assignmentPrefix=${result.assignmentPrefix},
     checkoutLevel= ${result.checkoutLevel},
     codePage= ${result.codePage},
