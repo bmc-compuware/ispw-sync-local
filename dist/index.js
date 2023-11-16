@@ -7486,6 +7486,8 @@
       result.stream = core.getInput('stream', { required: true });
       result.application = core.getInput('application', { required: true });
       result.subAppl = core.getInput('subAppl', {required: false})
+      result.ispwConfigPath =core.getInput('ispwConfigPath', {required: false});
+      result.assignmentPrefix =core.getInput('assignmentPrefix', {required: false});
       result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
       result.gitUid = core.getInput('gitUid', { required: true });
       result.gitToken = core.getInput('gitToken', { required: true });
@@ -7563,10 +7565,15 @@
       stream=${result.stream},
       application=${result.application},
       winTopazPath=${result.winTopazPath},
-      workspace=${result.workspace}`;
+      workspace=${result.workspace},
+      ispwConfigPath=${result.ispwConfigPath},
+      assignmentPrefix=${result.assignmentPrefix}
+      `;
       let logargs = ` Parsed the input arguments: 
     application= ${result.application},
     subAppl= ${result.subAppl},
+    ispwConfigPath=${result.ispwConfigPath},
+    assignmentPrefix=${result.assignmentPrefix},
     checkoutLevel= ${result.checkoutLevel},
     codePage= ${result.codePage},
     containerCreation= ${result.containerCreation},
@@ -7832,6 +7839,16 @@
                 args.push('-ispwServerSubAppl')
                 args.push(parms.subAppl)
               }
+              if (parms.ispwConfigPath) {
+                args.push('-ispwConfigPath')
+                args.push(parms.ispwConfigPath)
+              }
+              if (parms.assignmentPrefix) {
+                args.push('-assignmentPrefix')
+                args.push(parms.assignmentPrefix)
+              }
+              
+
               if (typeof parms.certificate != 'undefined' && parms.certificate) {
                   args.push('-certificate');
                   args.push(parms.certificate);

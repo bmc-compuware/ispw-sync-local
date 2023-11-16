@@ -127,4 +127,9 @@ export interface IISPWSyncParms {
    * before Commit id
    */
   //beforeCommit: string
+
+  
+  ispwConfigPath: string
+
+  assignmentPrefix: string
 }
