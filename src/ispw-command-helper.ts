@@ -179,7 +179,7 @@ export async function execISPWSync(
       '-gitBranch',
       parms.gitBranch,
       '-gitFromHash',
-      '-1',
+      parms.gitFromHash,
       '-targetFolder',
       parms.workspace,
       '-ispwContainerCreation',
@@ -193,15 +193,14 @@ export async function execISPWSync(
       args.push(parms.subAppl)
     }
 
-    if(parms.assignmentPrefix){
+    if (parms.assignmentPrefix) {
       args.push('-assignmentPrefix')
       args.push(parms.assignmentPrefix)
     }
-    if(parms.ispwConfigPath){
+    if (parms.ispwConfigPath) {
       args.push('-ispwConfigPath')
       args.push(parms.ispwConfigPath)
     }
-
 
     if (typeof parms.certificate != 'undefined' && parms.certificate) {
       args.push('-certificate')
@@ -240,6 +239,11 @@ export async function execISPWSync(
       args.push('-gitCommit')
       changedFileList = quoteArg(false, changedFileList)
       args.push(changedFileList)
+    }
+
+    if (parms.gitCommit) {
+      args.push('-gitCommit')
+      args.push(parms.gitCommit)
     }
 
     cwd = quoteArg(true, cwd)

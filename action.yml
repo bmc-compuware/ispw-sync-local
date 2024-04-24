@@ -78,6 +78,12 @@ inputs:
   ispwConfigPath :
     description: 'The path to Code Pipeline YAML configuration'
     required: false
+  gitCommit :
+    description: 'The Git commit hash (long or short) or a colon-delimited list of file paths in the workspace'
+    required: false
+  gitFromHash :
+    description: 'A Git hash to start syncing a list of commits which is not included in the sync, or -1 for multibranch project support'
+    required: false
 outputs:
   automaticBuildJson:
     description: 'The automatic build parameters JSON'

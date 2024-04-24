@@ -48,6 +48,13 @@ export function getInputs(): IISPWSyncParms {
   result.ispwConfigPath = core.getInput('ispwConfigPath',{required:false})
   result.checkoutLevel = core.getInput('checkoutLevel', {required: true})
   result.assignmentPrefix =core.getInput('assignmentPrefix',{required:false})
+  result.gitCommit = core.getInput('gitCommit', {required: false})
+  
+  let gitFromHash = core.getInput('gitFromHash')
+  if (!gitFromHash) {
+    gitFromHash = '-1'
+  }
+  result.gitFromHash = gitFromHash
 
   result.gitUid = core.getInput('gitUid', {required: true})
   result.gitToken = core.getInput('gitToken', {required: true})
@@ -141,6 +148,8 @@ export function getInputs(): IISPWSyncParms {
     workspace=${result.workspace},
     ispwConfigPath= ${result.ispwConfigPath},
     assignmentPrefix = ${result.assignmentPrefix}
+    gitCommit = ${result.gitCommit}
+    gitFromHash = ${result.gitFromHash}
     `
 
   let logargs = ` Parsed the input arguments: 
@@ -164,7 +173,9 @@ export function getInputs(): IISPWSyncParms {
   winTopazPath=${result.winTopazPath},
   workspace=${result.workspace},
   ispwConfigPath= ${result.ispwConfigPath},
-  assignmentPrefix = ${result.assignmentPrefix}`
+  assignmentPrefix = ${result.assignmentPrefix}
+  gitCommit = ${result.gitCommit}
+  gitFromHash = ${result.gitFromHash}`
 
   if (typeof result.certificate != 'undefined' && result.certificate) {
     inputargs = `${inputargs},
