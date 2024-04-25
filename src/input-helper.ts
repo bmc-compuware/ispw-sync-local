@@ -48,14 +48,19 @@ export function getInputs(): IISPWSyncParms {
   result.ispwConfigPath = core.getInput('ispwConfigPath',{required:false})
   result.checkoutLevel = core.getInput('checkoutLevel', {required: true})
   result.assignmentPrefix =core.getInput('assignmentPrefix',{required:false})
-  result.gitCommit = core.getInput('gitCommit', {required: false})
   
   let gitFromHash = core.getInput('gitFromHash')
   if (!gitFromHash) {
     gitFromHash = '-1'
   }
   result.gitFromHash = gitFromHash
-
+  
+  let gitCommit = core.getInput('gitCommit')
+  if (!gitCommit) {
+    gitCommit = github.context.sha
+  }
+  result.gitCommit = gitCommit
+  
   result.gitUid = core.getInput('gitUid', {required: true})
   result.gitToken = core.getInput('gitToken', {required: true})
 
@@ -84,7 +89,6 @@ export function getInputs(): IISPWSyncParms {
     ref = ref.substring('refs/heads/'.length)
   }
   result.gitBranch = ref
-  result.gitCommit = github.context.sha
 
   core.debug(`GitHub branch  = '${result.gitBranch}'`)
 

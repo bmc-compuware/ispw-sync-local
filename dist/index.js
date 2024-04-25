@@ -7488,12 +7488,16 @@
       result.subAppl = core.getInput('subAppl', {required: false})
       result.ispwConfigPath =core.getInput('ispwConfigPath', {required: false});
       result.assignmentPrefix =core.getInput('assignmentPrefix', {required: false});
-      result.gitCommit = core.getInput('gitCommit', {required: false});
 	  let gitFromHash = core.getInput('gitFromHash');
 	  if (!gitFromHash) {
 	    gitFromHash = '-1';
 	  }
 	  result.gitFromHash = gitFromHash;
+	  let gitCommit = core.getInput('gitCommit')
+	  if (!gitCommit) {
+	    gitCommit = github.context.sha
+	  }
+	  result.gitCommit = gitCommit
       result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
       result.gitUid = core.getInput('gitUid', { required: true });
       result.gitToken = core.getInput('gitToken', { required: true });
@@ -7517,7 +7521,6 @@
           ref = ref.substring('refs/heads/'.length);
       }
       result.gitBranch = ref;
-      result.gitCommit = github.context.sha;
       core.debug(`GitHub branch  = '${result.gitBranch}'`);
       let containerCreation = core.getInput('containerCreation');
       if (!containerCreation) {
