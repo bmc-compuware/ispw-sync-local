@@ -7889,15 +7889,15 @@
                   args.push('-gitCommitFile');
                   args.push(tempHash);
               }
+              else if (parms.gitCommit) {
+			      args.push('-gitCommit')
+			      args.push(parms.gitCommit)
+			  }
               else {
                   args.push('-gitCommit');
                   changedFileList = quoteArg(false, changedFileList);
                   args.push(changedFileList);
               }
-			  if (parms.gitCommit) {
-			      args.push('-gitCommit')
-			      args.push(parms.gitCommit)
-			  }
               cwd = quoteArg(true, cwd);
               cliPath = quoteArg(true, cliPath);
               core.debug(`ISPW CLI parms: ${parms}`);

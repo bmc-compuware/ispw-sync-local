@@ -235,15 +235,14 @@ export async function execISPWSync(
     if (changedFileList.length > 2048) {
       args.push('-gitCommitFile')
       args.push(tempHash)
-    } else {
+    } 
+    else if (parms.gitCommit) {
+      args.push('-gitCommit')
+      args.push(parms.gitCommit)
+    }else {
       args.push('-gitCommit')
       changedFileList = quoteArg(false, changedFileList)
       args.push(changedFileList)
-    }
-
-    if (parms.gitCommit) {
-      args.push('-gitCommit')
-      args.push(parms.gitCommit)
     }
 
     cwd = quoteArg(true, cwd)
