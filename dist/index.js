@@ -7494,13 +7494,13 @@
 	  }
 	  result.gitFromHash = gitFromHash;
 	  let gitCommit = core.getInput('gitCommit')
-	  core.info('Jalaj get Inputs before: ${gitCommit}');
+	  core.info(`Jalaj get Inputs before: ${gitCommit}`);
 	  if (!gitCommit) {
 	    gitCommit = github.context.sha
 	  }
-	  core.info('Jalaj get Inputs After: ${gitCommit}');
+	  core.info(`Jalaj get Inputs After: ${gitCommit}`);
 	  result.gitCommit = gitCommit
-	  core.info('Jalaj get Inputs After After: ${result.gitCommit}');
+	  core.info(`Jalaj get Inputs After After: ${gitCommit}`);
       result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
       result.gitUid = core.getInput('gitUid', { required: true });
       result.gitToken = core.getInput('gitToken', { required: true });
@@ -7557,7 +7557,7 @@
       //  result.commit = result.ref
       //  result.ref = ''
       //}
-      core.info('Jalaj Before Input args: ${result.gitCommit}');
+      core.info(`Jalaj Before Input args: ${result.gitCommit}`);
       let inputargs = ` Parsed the input arguments: 
       application= ${result.application},
       subAppl= ${result.subAppl},
@@ -7583,7 +7583,7 @@
       gitCommit = ${result.gitCommit},
       gitFromHash = ${result.gitFromHash}
       `;
-      core.info('Jalaj Before Log args: ${result.gitCommit}');
+      core.info(`Jalaj Before Log args: ${result.gitCommit}`);
       let logargs = ` Parsed the input arguments: 
     application= ${result.application},
     subAppl= ${result.subAppl},
@@ -7737,7 +7737,7 @@
               }
               core.debug(`Check the path: ${configPath}`);
               const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
-              core.debug(`Check the file: ${changedPrograms}`);
+              debug(`Check the file: ${changedPrograms}`);
               try {
                   if (fs_1.existsSync(changedPrograms)) {
                       try {
@@ -7888,23 +7888,23 @@
                   args.push('-protocol');
                   args.push(parms.encryptionProtocol);
               }
-              core.info('Jalaj Parms: ${parms.gitCommit}');
+              core.info(`Jalaj Parms: ${parms.gitCommit}`);
               if (parms.containerDescription) {
                   args.push('-ispwContainerDescription');
                   args.push(parms.containerDescription);
               }
               if (changedFileList.length > 2048) {
-               core.info('Jalaj inside changed file ${changedFileList.length}');
+               core.info(`Jalaj inside changed file ${changedFileList.length}`);
                   args.push('-gitCommitFile');
                   args.push(tempHash);
               }
               else if (parms.gitCommit) {
-              core.info('Jalaj inside parms: ${parms.gitCommit}');
+              core.info(`Jalaj inside parms: ${parms.gitCommit}`);
 			      args.push('-gitCommit')
 			      args.push(parms.gitCommit)
 			  }
               else {
-               core.info('Jalaj Inside else: ${changedFileList}');
+               core.info(`Jalaj Inside else: ${changedFileList}`);
                   args.push('-gitCommit');
                   changedFileList = quoteArg(false, changedFileList);
                   args.push(changedFileList);
