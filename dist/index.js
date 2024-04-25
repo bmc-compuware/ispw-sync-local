@@ -7893,15 +7893,17 @@
                   args.push('-ispwContainerDescription');
                   args.push(parms.containerDescription);
               }
+              let gitCommit = core.getInput('gitCommit');
+              core.info(`Jalaj new GitCommit: ${gitCommit}`);
               if (changedFileList.length > 2048) {
                core.info(`Jalaj inside changed file ${changedFileList.length}`);
                   args.push('-gitCommitFile');
                   args.push(tempHash);
               }
-              else if (parms.gitCommit) {
-              core.info(`Jalaj inside parms: ${parms.gitCommit}`);
+              else if (gitCommit) {
+              core.info(`Jalaj inside GitCommit: ${gitCommit}`);
 			      args.push('-gitCommit')
-			      args.push(parms.gitCommit)
+			      args.push(gitCommit)
 			  }
               else {
                core.info(`Jalaj Inside else: ${changedFileList}`);
