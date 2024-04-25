@@ -7488,6 +7488,12 @@
       result.subAppl = core.getInput('subAppl', {required: false})
       result.ispwConfigPath =core.getInput('ispwConfigPath', {required: false});
       result.assignmentPrefix =core.getInput('assignmentPrefix', {required: false});
+      result.gitCommit = core.getInput('gitCommit', {required: false});
+	  let gitFromHash = core.getInput('gitFromHash');
+	  if (!gitFromHash) {
+	    gitFromHash = '-1';
+	  }
+	  result.gitFromHash = gitFromHash;
       result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
       result.gitUid = core.getInput('gitUid', { required: true });
       result.gitToken = core.getInput('gitToken', { required: true });
@@ -7567,7 +7573,9 @@
       winTopazPath=${result.winTopazPath},
       workspace=${result.workspace},
       ispwConfigPath=${result.ispwConfigPath},
-      assignmentPrefix=${result.assignmentPrefix}
+      assignmentPrefix=${result.assignmentPrefix},
+      gitCommit = ${result.gitCommit},
+      gitFromHash = ${result.gitFromHash}
       `;
       let logargs = ` Parsed the input arguments: 
     application= ${result.application},
@@ -7590,7 +7598,9 @@
     stream=${result.stream},
     application=${result.application},
     winTopazPath=${result.winTopazPath},
-    workspace=${result.workspace}`;
+    workspace=${result.workspace},
+    gitCommit = ${result.gitCommit},
+    gitFromHash = ${result.gitFromHash}`;
       if (typeof result.certificate != 'undefined' && result.certificate) {
           inputargs = `${inputargs},
       certificate=${result.certificate}`;
@@ -7827,7 +7837,7 @@
                   '-gitBranch',
                   parms.gitBranch,
                   '-gitFromHash',
-                  '-1',
+                  parms.gitFromHash,
                   '-targetFolder',
                   parms.workspace,
                   '-ispwContainerCreation',
@@ -7884,6 +7894,10 @@
                   changedFileList = quoteArg(false, changedFileList);
                   args.push(changedFileList);
               }
+			  if (parms.gitCommit) {
+			      args.push('-gitCommit')
+			      args.push(parms.gitCommit)
+			  }
               cwd = quoteArg(true, cwd);
               cliPath = quoteArg(true, cliPath);
               core.debug(`ISPW CLI parms: ${parms}`);
