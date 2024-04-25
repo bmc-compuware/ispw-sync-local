@@ -7737,7 +7737,7 @@
               }
               core.debug(`Check the path: ${configPath}`);
               const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
-              debug(`Check the file: ${changedPrograms}`);
+              core.debug(`Check the file: ${changedPrograms}`);
               try {
                   if (fs_1.existsSync(changedPrograms)) {
                       try {
