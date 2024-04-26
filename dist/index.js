@@ -7499,13 +7499,10 @@
         gitFromHash = '-1';
       }
       result.gitFromHash = gitFromHash;
-      core.info(`Jalaj get Inputs before: ${gitCommit}`);
       if (!gitCommit) {
         gitCommit = github.context.sha
       }
-      core.info(`Jalaj get Inputs After: ${gitCommit}`);
       result.gitCommit = gitCommit
-      core.info(`Jalaj get Inputs After After: ${gitCommit}`);
       let gitLocalPath = core.getInput('gitLocalPath');
       if (!gitLocalPath) {
         gitLocalPath = githubWorkspacePath;
@@ -7575,7 +7572,6 @@
       //  result.commit = result.ref
       //  result.ref = ''
       //}
-      core.info(`Jalaj Before Input args: ${result.gitCommit}`);
       let inputargs = ` Parsed the input arguments: 
       application= ${result.application},
       subAppl= ${result.subAppl},
@@ -7603,7 +7599,6 @@
       gitCommitFile = ${result.gitCommitFile},
       gitLocalPath = ${result.gitLocalPath}
       `;
-      core.info(`Jalaj Before Log args: ${result.gitCommit}`);
       let logargs = ` Parsed the input arguments: 
     application= ${result.application},
     subAppl= ${result.subAppl},
@@ -7910,25 +7905,20 @@
                   args.push('-protocol');
                   args.push(parms.encryptionProtocol);
               }
-              core.info(`Jalaj Parms: ${parms.gitCommit}`);
               if (parms.containerDescription) {
                   args.push('-ispwContainerDescription');
                   args.push(parms.containerDescription);
               }
               let gitCommit = core.getInput('gitCommit');
-              core.info(`Jalaj new GitCommit: ${gitCommit}`);
               if (changedFileList.length > 2048) {
-               core.info(`Jalaj inside changed file ${changedFileList.length}`);
                   args.push('-gitCommitFile');
                   args.push(tempHash);
               }
               else if (gitCommit) {
-              core.info(`Jalaj inside GitCommit: ${gitCommit}`);
               args.push('-gitCommit')
               args.push(gitCommit)
 			        }
               else {
-               core.info(`Jalaj Inside else: ${changedFileList}`);
                   args.push('-gitCommit');
                   changedFileList = quoteArg(false, changedFileList);
                   args.push(changedFileList);
