@@ -185,7 +185,7 @@ export async function execISPWSync(
       '-ispwContainerCreation',
       parms.containerCreation,
       '-gitLocalPath',
-      parms.workspace
+      parms.gitLocalPath
     ]
 
     if (parms.subAppl) {
@@ -231,7 +231,7 @@ export async function execISPWSync(
       args.push('-ispwContainerDescription')
       args.push(parms.containerDescription)
     }
-	let gitCommit = core.getInput('gitCommit');
+	  let gitCommit = core.getInput('gitCommit');
     if (changedFileList.length > 2048) {
       args.push('-gitCommitFile')
       args.push(tempHash)
@@ -243,6 +243,11 @@ export async function execISPWSync(
       args.push('-gitCommit')
       changedFileList = quoteArg(false, changedFileList)
       args.push(changedFileList)
+    }
+
+    if (parms.gitCommitFile) {
+      args.push('-gitCommitFile')
+      args.push(parms.gitCommitFile)
     }
 
     cwd = quoteArg(true, cwd)

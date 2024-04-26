@@ -7488,6 +7488,7 @@
       result.subAppl = core.getInput('subAppl', {required: false})
       result.ispwConfigPath =core.getInput('ispwConfigPath', {required: false});
       result.assignmentPrefix =core.getInput('assignmentPrefix', {required: false});
+      result.gitCommitFile =core.getInput('gitCommitFile',{required:false});
       let gitFromHash = core.getInput('gitFromHash');
       let gitCommit = core.getInput('gitCommit');
       if((gitFromHash && !gitCommit) ||(!gitFromHash && gitCommit))
@@ -7505,6 +7506,11 @@
       core.info(`Jalaj get Inputs After: ${gitCommit}`);
       result.gitCommit = gitCommit
       core.info(`Jalaj get Inputs After After: ${gitCommit}`);
+      let gitLocalPath = core.getInput('gitLocalPath');
+      if (!gitLocalPath) {
+        gitLocalPath = githubWorkspacePath;
+      }
+      result.gitLocalPath = gitLocalPath;
       result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
       result.gitUid = core.getInput('gitUid', { required: true });
       result.gitToken = core.getInput('gitToken', { required: true });
@@ -7520,14 +7526,22 @@
       if (repoUrl && !repoUrl.endsWith('.git')) {
           repoUrl = repoUrl.concat('.git');
       }
-      result.gitRepoUrl = repoUrl;
+      let gitRepoUrl = core.getInput('gitRepoUrl');
+      if (!gitRepoUrl) {
+        gitRepoUrl = repoUrl;
+      }
+      result.gitRepoUrl = gitRepoUrl;
       core.debug(`GitHub Repo url  = '${result.gitRepoUrl}'`);
       let ref = github.context.ref;
       core.debug(`github.context.ref  = '${ref}'`);
       if (ref && ref.startsWith('refs/heads/')) {
           ref = ref.substring('refs/heads/'.length);
       }
-      result.gitBranch = ref;
+      let gitBranch = core.getInput('gitBranch');
+      if (!gitBranch) {
+        gitBranch = ref;
+      }
+      result.gitBranch = gitBranch;
       core.debug(`GitHub branch  = '${result.gitBranch}'`);
       let containerCreation = core.getInput('containerCreation');
       if (!containerCreation) {
@@ -7586,6 +7600,8 @@
       assignmentPrefix=${result.assignmentPrefix},
       gitCommit = ${result.gitCommit},
       gitFromHash = ${result.gitFromHash}
+      gitCommitFile = ${result.gitCommitFile},
+      gitLocalPath = ${result.gitLocalPath}
       `;
       core.info(`Jalaj Before Log args: ${result.gitCommit}`);
       let logargs = ` Parsed the input arguments: 
@@ -7611,7 +7627,9 @@
     winTopazPath=${result.winTopazPath},
     workspace=${result.workspace},
     gitCommit = ${result.gitCommit},
-    gitFromHash = ${result.gitFromHash}`;
+    gitFromHash = ${result.gitFromHash}
+    gitCommitFile = ${result.gitCommitFile},
+    gitLocalPath = ${result.gitLocalPath}`;
       if (typeof result.certificate != 'undefined' && result.certificate) {
           inputargs = `${inputargs},
       certificate=${result.certificate}`;
@@ -7854,7 +7872,7 @@
                   '-ispwContainerCreation',
                   parms.containerCreation,
                   '-gitLocalPath',
-                  parms.workspace
+                  parms.gitLocalPath
               ];
               if (parms.subAppl) {
                 args.push('-ispwServerSubAppl')
@@ -7906,14 +7924,18 @@
               }
               else if (gitCommit) {
               core.info(`Jalaj inside GitCommit: ${gitCommit}`);
-			      args.push('-gitCommit')
-			      args.push(gitCommit)
-			  }
+              args.push('-gitCommit')
+              args.push(gitCommit)
+			        }
               else {
                core.info(`Jalaj Inside else: ${changedFileList}`);
                   args.push('-gitCommit');
                   changedFileList = quoteArg(false, changedFileList);
                   args.push(changedFileList);
+              }
+              if (parms.gitCommitFile) {
+                args.push('-gitCommitFile');
+                args.push(parms.gitCommitFile);
               }
               cwd = quoteArg(true, cwd);
               cliPath = quoteArg(true, cliPath);

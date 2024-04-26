@@ -133,4 +133,8 @@ export interface IISPWSyncParms {
   assignmentPrefix: string
 
   gitFromHash: string
+
+  gitCommitFile: string
+
+  gitLocalPath: string
 }
