@@ -7488,19 +7488,23 @@
       result.subAppl = core.getInput('subAppl', {required: false})
       result.ispwConfigPath =core.getInput('ispwConfigPath', {required: false});
       result.assignmentPrefix =core.getInput('assignmentPrefix', {required: false});
-	  let gitFromHash = core.getInput('gitFromHash');
-	  if (!gitFromHash) {
-	    gitFromHash = '-1';
-	  }
-	  result.gitFromHash = gitFromHash;
-	  let gitCommit = core.getInput('gitCommit')
-	  core.info(`Jalaj get Inputs before: ${gitCommit}`);
-	  if (!gitCommit) {
-	    gitCommit = github.context.sha
-	  }
-	  core.info(`Jalaj get Inputs After: ${gitCommit}`);
-	  result.gitCommit = gitCommit
-	  core.info(`Jalaj get Inputs After After: ${gitCommit}`);
+      let gitFromHash = core.getInput('gitFromHash');
+      let gitCommit = core.getInput('gitCommit');
+      if((gitFromHash && !gitCommit) ||(!gitFromHash && gitCommit))
+      {
+        throw new Error('gitCommit and gitFromHash variables need to be defined together');
+      }
+      if (!gitFromHash) {
+        gitFromHash = '-1';
+      }
+      result.gitFromHash = gitFromHash;
+      core.info(`Jalaj get Inputs before: ${gitCommit}`);
+      if (!gitCommit) {
+        gitCommit = github.context.sha
+      }
+      core.info(`Jalaj get Inputs After: ${gitCommit}`);
+      result.gitCommit = gitCommit
+      core.info(`Jalaj get Inputs After After: ${gitCommit}`);
       result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
       result.gitUid = core.getInput('gitUid', { required: true });
       result.gitToken = core.getInput('gitToken', { required: true });

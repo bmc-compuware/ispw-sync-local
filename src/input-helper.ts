@@ -50,12 +50,18 @@ export function getInputs(): IISPWSyncParms {
   result.assignmentPrefix =core.getInput('assignmentPrefix',{required:false})
   
   let gitFromHash = core.getInput('gitFromHash')
+  let gitCommit = core.getInput('gitCommit')
+  
+  if((gitFromHash && !gitCommit) ||(!gitFromHash && gitCommit))
+  {
+		throw new Error('gitCommit and gitFromHash variables need to be defined together')
+  }
+  
   if (!gitFromHash) {
     gitFromHash = '-1'
   }
   result.gitFromHash = gitFromHash
   
-  let gitCommit = core.getInput('gitCommit')
   if (!gitCommit) {
     gitCommit = github.context.sha
   }
