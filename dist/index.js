@@ -7909,7 +7909,7 @@
                   args.push('-ispwContainerDescription');
                   args.push(parms.containerDescription);
               }
-              let gitCommit = core.getInput('gitCommit');
+              const gitCommit = core.getInput('gitCommit');
               if (changedFileList.length > 2048) {
                   args.push('-gitCommitFile');
                   args.push(tempHash);
