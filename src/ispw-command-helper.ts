@@ -231,12 +231,12 @@ export async function execISPWSync(
       args.push('-ispwContainerDescription')
       args.push(parms.containerDescription)
     }
-
+	let gitCommit = core.getInput('gitCommit');
     if (changedFileList.length > 2048) {
       args.push('-gitCommitFile')
       args.push(tempHash)
     } 
-    else if (parms.gitCommit) {
+    else if (gitCommit) {
       args.push('-gitCommit')
       args.push(parms.gitCommit)
     }else {
