@@ -7595,7 +7595,7 @@
       ispwConfigPath=${result.ispwConfigPath},
       assignmentPrefix=${result.assignmentPrefix},
       gitCommit = ${result.gitCommit},
-      gitFromHash = ${result.gitFromHash}
+      gitFromHash = ${result.gitFromHash},
       gitCommitFile = ${result.gitCommitFile},
       gitLocalPath = ${result.gitLocalPath}
       `;
@@ -7622,7 +7622,7 @@
     winTopazPath=${result.winTopazPath},
     workspace=${result.workspace},
     gitCommit = ${result.gitCommit},
-    gitFromHash = ${result.gitFromHash}
+    gitFromHash = ${result.gitFromHash},
     gitCommitFile = ${result.gitCommitFile},
     gitLocalPath = ${result.gitLocalPath}`;
       if (typeof result.certificate != 'undefined' && result.certificate) {
