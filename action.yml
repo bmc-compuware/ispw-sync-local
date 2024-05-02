@@ -78,6 +78,24 @@ inputs:
   ispwConfigPath :
     description: 'The path to Code Pipeline YAML configuration'
     required: false
+  gitCommit :
+    description: 'The Git commit hash (long or short) or a colon-delimited list of file paths in the workspace'
+    required: false
+  gitFromHash :
+    description: 'A Git hash to start syncing a list of commits which is not included in the sync, or -1 for multibranch project support'
+    required: false
+  gitBranch :
+    description: 'The target Git branch name'
+    required: false
+  gitCommitFile :
+    description: 'The name of a file which contains a colon-delimited list of file paths in the workspace'
+    required: false
+  gitRepoUrl :
+    description: 'Git Repository URL. By default it takes the URL of repository on which we are running our Github Action'
+    required: false
+  gitLocalPath :
+    description: 'The location of the local Git. By default it is set as Github Workspace Path'
+    required: false
 outputs:
   automaticBuildJson:
     description: 'The automatic build parameters JSON'

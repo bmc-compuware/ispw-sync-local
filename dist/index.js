@@ -7488,6 +7488,26 @@
       result.subAppl = core.getInput('subAppl', {required: false})
       result.ispwConfigPath =core.getInput('ispwConfigPath', {required: false});
       result.assignmentPrefix =core.getInput('assignmentPrefix', {required: false});
+      result.gitCommitFile =core.getInput('gitCommitFile',{required:false});
+      let gitFromHash = core.getInput('gitFromHash');
+      let gitCommit = core.getInput('gitCommit');
+      if((gitFromHash && !gitCommit) ||(!gitFromHash && gitCommit))
+      {
+        throw new Error('gitCommit and gitFromHash variables need to be defined together');
+      }
+      if (!gitFromHash) {
+        gitFromHash = '-1';
+      }
+      result.gitFromHash = gitFromHash;
+      if (!gitCommit) {
+        gitCommit = github.context.sha
+      }
+      result.gitCommit = gitCommit
+      let gitLocalPath = core.getInput('gitLocalPath');
+      if (!gitLocalPath) {
+        gitLocalPath = githubWorkspacePath;
+      }
+      result.gitLocalPath = gitLocalPath;
       result.checkoutLevel = core.getInput('checkoutLevel', { required: true });
       result.gitUid = core.getInput('gitUid', { required: true });
       result.gitToken = core.getInput('gitToken', { required: true });
@@ -7503,15 +7523,22 @@
       if (repoUrl && !repoUrl.endsWith('.git')) {
           repoUrl = repoUrl.concat('.git');
       }
-      result.gitRepoUrl = repoUrl;
+      let gitRepoUrl = core.getInput('gitRepoUrl');
+      if (!gitRepoUrl) {
+        gitRepoUrl = repoUrl;
+      }
+      result.gitRepoUrl = gitRepoUrl;
       core.debug(`GitHub Repo url  = '${result.gitRepoUrl}'`);
       let ref = github.context.ref;
       core.debug(`github.context.ref  = '${ref}'`);
       if (ref && ref.startsWith('refs/heads/')) {
           ref = ref.substring('refs/heads/'.length);
       }
-      result.gitBranch = ref;
-      result.gitCommit = github.context.sha;
+      let gitBranch = core.getInput('gitBranch');
+      if (!gitBranch) {
+        gitBranch = ref;
+      }
+      result.gitBranch = gitBranch;
       core.debug(`GitHub branch  = '${result.gitBranch}'`);
       let containerCreation = core.getInput('containerCreation');
       if (!containerCreation) {
@@ -7554,7 +7581,6 @@
       containerDescription=${result.containerDescription},
       encryptionProtocol=${result.encryptionProtocol},
       gitBranch=${result.gitBranch},
-      gitCommit=${result.gitCommit},
       gitToken=${result.gitToken},
       gitRepoUr=${result.gitRepoUrl},
       gitUid=${result.gitUid},
@@ -7567,7 +7593,11 @@
       winTopazPath=${result.winTopazPath},
       workspace=${result.workspace},
       ispwConfigPath=${result.ispwConfigPath},
-      assignmentPrefix=${result.assignmentPrefix}
+      assignmentPrefix=${result.assignmentPrefix},
+      gitCommit = ${result.gitCommit},
+      gitFromHash = ${result.gitFromHash},
+      gitCommitFile = ${result.gitCommitFile},
+      gitLocalPath = ${result.gitLocalPath}
       `;
       let logargs = ` Parsed the input arguments: 
     application= ${result.application},
@@ -7590,7 +7620,11 @@
     stream=${result.stream},
     application=${result.application},
     winTopazPath=${result.winTopazPath},
-    workspace=${result.workspace}`;
+    workspace=${result.workspace},
+    gitCommit = ${result.gitCommit},
+    gitFromHash = ${result.gitFromHash},
+    gitCommitFile = ${result.gitCommitFile},
+    gitLocalPath = ${result.gitLocalPath}`;
       if (typeof result.certificate != 'undefined' && result.certificate) {
           inputargs = `${inputargs},
       certificate=${result.certificate}`;
@@ -7827,13 +7861,13 @@
                   '-gitBranch',
                   parms.gitBranch,
                   '-gitFromHash',
-                  '-1',
+                  parms.gitFromHash,
                   '-targetFolder',
                   parms.workspace,
                   '-ispwContainerCreation',
                   parms.containerCreation,
                   '-gitLocalPath',
-                  parms.workspace
+                  parms.gitLocalPath
               ];
               if (parms.subAppl) {
                 args.push('-ispwServerSubAppl')
@@ -7875,14 +7909,23 @@
                   args.push('-ispwContainerDescription');
                   args.push(parms.containerDescription);
               }
+              const gitCommit = core.getInput('gitCommit');
               if (changedFileList.length > 2048) {
                   args.push('-gitCommitFile');
                   args.push(tempHash);
               }
+              else if (gitCommit) {
+              args.push('-gitCommit')
+              args.push(gitCommit)
+			        }
               else {
                   args.push('-gitCommit');
                   changedFileList = quoteArg(false, changedFileList);
                   args.push(changedFileList);
+              }
+              if (parms.gitCommitFile) {
+                args.push('-gitCommitFile');
+                args.push(parms.gitCommitFile);
               }
               cwd = quoteArg(true, cwd);
               cliPath = quoteArg(true, cliPath);

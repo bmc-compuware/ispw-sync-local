@@ -128,8 +128,13 @@ export interface IISPWSyncParms {
    */
   //beforeCommit: string
 
-  
   ispwConfigPath: string
 
   assignmentPrefix: string
+
+  gitFromHash: string
+
+  gitCommitFile: string
+
+  gitLocalPath: string
 }

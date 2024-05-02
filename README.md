@@ -70,6 +70,12 @@ This action will load changed components into Code Pipeline on the mainframe fro
 | `showEnv` | **Optional** | Show value of environment variables for debugging. Possible values are `true` or `false` |
 | `assignmentPrefix` | **Optional** | The prefix to be used for the Code Pipeline container. For example, `"PLAY"` |
 | `ispwConfigPath` | **Optional** | The path to Code Pipeline YAML configuration. For example, `"demo\ispwconfig.yml"` |
+| `gitCommit` | **Optional** | The Git commit hash (long or short) or a colon-delimited list of file paths in the workspace. This input parameter needs to be used in combination with input parameter gitFromHash |
+| `gitFromHash` | **Optional** | A Git hash to start syncing a list of commits which is not included in the sync, or -1 for multibranch project support. This input parameter needs to be used in combination with input parameter gitCommit|
+| `gitBranch` | **Optional** | The target Git branch name|
+| `gitCommitFile` | **Optional** | The name of a file which contains a colon-delimited list of file paths in the workspace|
+| `gitRepoUrl` | **Optional** | Git Repository URL. By default it takes the URL of repository on which we are running our Github Action|
+| `gitLocalPath` | **Optional** | The location of the local Git. By default it is set as Github Workspace Path|
 
 ## Outputs
 

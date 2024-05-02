@@ -48,7 +48,32 @@ export function getInputs(): IISPWSyncParms {
   result.ispwConfigPath = core.getInput('ispwConfigPath',{required:false})
   result.checkoutLevel = core.getInput('checkoutLevel', {required: true})
   result.assignmentPrefix =core.getInput('assignmentPrefix',{required:false})
+  result.gitCommitFile =core.getInput('gitCommitFile',{required:false})
+  
+  let gitFromHash = core.getInput('gitFromHash')
+  let gitCommit = core.getInput('gitCommit')
+  
+  if((gitFromHash && !gitCommit) ||(!gitFromHash && gitCommit))
+  {
+		throw new Error('gitCommit and gitFromHash variables need to be defined together')
+  }
 
+  if (!gitFromHash) {
+    gitFromHash = '-1'
+  }
+  result.gitFromHash = gitFromHash
+  
+  if (!gitCommit) {
+    gitCommit = github.context.sha
+  }
+  result.gitCommit = gitCommit
+
+  let gitLocalPath = core.getInput('gitLocalPath')
+  if (!gitLocalPath) {
+    gitLocalPath = githubWorkspacePath
+  }
+  result.gitLocalPath = gitLocalPath
+  
   result.gitUid = core.getInput('gitUid', {required: true})
   result.gitToken = core.getInput('gitToken', {required: true})
 
@@ -67,7 +92,11 @@ export function getInputs(): IISPWSyncParms {
   if (repoUrl && !repoUrl.endsWith('.git')) {
     repoUrl = repoUrl.concat('.git')
   }
-  result.gitRepoUrl = repoUrl
+  let gitRepoUrl = core.getInput('gitRepoUrl')
+  if (!gitRepoUrl) {
+    gitRepoUrl = repoUrl
+  }
+  result.gitRepoUrl = gitRepoUrl
   core.debug(`GitHub Repo url  = '${result.gitRepoUrl}'`)
 
   let ref: string = github.context.ref
@@ -76,9 +105,12 @@ export function getInputs(): IISPWSyncParms {
   if (ref && ref.startsWith('refs/heads/')) {
     ref = ref.substring('refs/heads/'.length)
   }
-  result.gitBranch = ref
-  result.gitCommit = github.context.sha
-
+ 
+  let gitBranch = core.getInput('gitBranch')
+  if (!gitBranch) {
+    gitBranch = ref
+  }
+  result.gitBranch = gitBranch
   core.debug(`GitHub branch  = '${result.gitBranch}'`)
 
   let containerCreation = core.getInput('containerCreation')
@@ -127,7 +159,6 @@ export function getInputs(): IISPWSyncParms {
     containerDescription=${result.containerDescription},
     encryptionProtocol=${result.encryptionProtocol},
     gitBranch=${result.gitBranch},
-    gitCommit=${result.gitCommit},
     gitToken=${result.gitToken},
     gitRepoUr=${result.gitRepoUrl},
     gitUid=${result.gitUid},
@@ -140,7 +171,11 @@ export function getInputs(): IISPWSyncParms {
     winTopazPath=${result.winTopazPath},
     workspace=${result.workspace},
     ispwConfigPath= ${result.ispwConfigPath},
-    assignmentPrefix = ${result.assignmentPrefix}
+    assignmentPrefix = ${result.assignmentPrefix},
+    gitCommit = ${result.gitCommit},
+    gitFromHash = ${result.gitFromHash},
+    gitCommitFile = ${result.gitCommitFile},
+    gitLocalPath = ${result.gitLocalPath}
     `
 
   let logargs = ` Parsed the input arguments: 
@@ -152,7 +187,6 @@ export function getInputs(): IISPWSyncParms {
   containerDescription=${result.containerDescription},
   encryptionProtocol=${result.encryptionProtocol},
   gitBranch=${result.gitBranch},
-  gitCommit=${result.gitCommit},
   gitRepoUr=${result.gitRepoUrl},
   gitUid=${result.gitUid},
   host=${result.host},
@@ -164,7 +198,11 @@ export function getInputs(): IISPWSyncParms {
   winTopazPath=${result.winTopazPath},
   workspace=${result.workspace},
   ispwConfigPath= ${result.ispwConfigPath},
-  assignmentPrefix = ${result.assignmentPrefix}`
+  assignmentPrefix = ${result.assignmentPrefix},
+  gitCommit = ${result.gitCommit},
+  gitFromHash = ${result.gitFromHash},
+  gitCommitFile = ${result.gitCommitFile},
+  gitLocalPath = ${result.gitLocalPath}`
 
   if (typeof result.certificate != 'undefined' && result.certificate) {
     inputargs = `${inputargs},
