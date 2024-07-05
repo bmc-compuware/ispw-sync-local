@@ -29,10 +29,12 @@ async function run(): Promise<void> {
     }
 
     core.info('Setting up the output values')
+    console.log("curWk : " + curWk);
     const workpace: string = curWk ?? ''
 
     //Execution is completed
     try {
+      console.log("workpace : " + workpace);
       const autoBuildParms = path.join(workpace, 'automaticBuildParams.txt')
       if (existsSync(autoBuildParms)) {
         const dataStr = readFileSync(autoBuildParms).toString('utf8')

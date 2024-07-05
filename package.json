@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Action to sync Code Pipeline source from a self-hosted runner, onto the mainframe.",
   "publisher": "BMC",
-  "main": "dist/index.js",
+  "main": "dist/main.js",
   "scripts": {
     "build": "tsc",
     "format": "prettier --write **/*.ts",
