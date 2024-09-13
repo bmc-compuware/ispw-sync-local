@@ -52,7 +52,7 @@ async function run(): Promise<void> {
 	core.info('New Code Start')
 	try {
 		// Normalize the workspace path to remove any dangerous characters like "../"
-		core.info('Workspace'+Workpace)
+		core.info('Workspace'+workpace)
 		const normalizedWorkpace = path.normalize(workpace);
 		core.info('Normalized Workspace'+normalizedWorkpace)
 
