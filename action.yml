@@ -103,4 +103,4 @@ outputs:
     description: 'The changed programs JSON'
 runs:
   using: 'node12'
-  main: 'dist/main.js'
+  main: 'dist/index.js'
