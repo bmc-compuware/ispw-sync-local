@@ -28,58 +28,39 @@ async function run(): Promise<void> {
       }
     }
 
-    core.info('Setting up the output values')
-    const workpace: string = curWk ?? ''
-	
-	core.info('Old Code Start')
-    //Execution is completed
+    core.info('Setting up the output values');
+    const workspace: string = curWk ?? '';
+    
     try {
-	  core.info('Workspace:'+workpace)
-      const autoBuildParms = path.join(workpace, 'automaticBuildParams.txt')
-	  core.info('Autobuildparams:'+autoBuildParms)
-      if (existsSync(autoBuildParms)) {
-        const dataStr = readFileSync(autoBuildParms).toString('utf8')
-        core.setOutput('automaticBuildJson', dataStr)
+      // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+      const resolvedWorkspace = path.resolve(path.normalize(workspace));
+    
+      // Use path.normalize and validate against the GITHUB_WORKSPACE
+      const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
+    
+      // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
+      const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
+    
+      // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        throw new Error('Potential path traversal detected!');
+      }
+    
+      const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
+      const normalizedAutoBuild = path.normalize(autoBuildParms);
+    
+      // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
+      const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
+      if (!relativeAutoBuild.startsWith('..') && existsSync(normalizedAutoBuild)) {
+        const dataStr = readFileSync(normalizedAutoBuild).toString('utf8');
+        core.setOutput('automaticBuildJson', dataStr);
       }
     } catch (error) {
       if (error instanceof Error) {
-        core.info(`Fail to read file: automaticBuildParams.txt`)
-        core.info(error.message)
+        core.info(`Failed to read file: automaticBuildParams.txt`);
+        core.info(error.message);
       }
-    }
-	core.info('Old Code End')
-	
-	core.info('New Code Start')
-	try {
-		// Normalize the workspace path to remove any dangerous characters like "../"
-		core.info('Workspace'+workpace)
-		const normalizedWorkpace = path.normalize(workpace);
-		core.info('Normalized Workspace'+normalizedWorkpace)
-
-		// Check if the resolved path is absolute. If not, throw an error
-		if (!path.isAbsolute(normalizedWorkpace)) {
-			throw new Error('Invalid workspace path: Path must be absolute');
-		}
-
-		// Ensure that the normalized path doesn't escape to unintended directories (no "../" traversal)
-		if (normalizedWorkpace.includes('..')) {
-			throw new Error('Potential path traversal detected!');
-		}
-
-		//const autoBuildParms = path.join(workpace, 'automaticBuildParams.txt')
-		const autoBuildParms = path.join(normalizedWorkpace, 'automaticBuildParams.txt')
-		core.info('Auto Build Parms'+autoBuildParms)
-		if (existsSync(autoBuildParms)) {
-			const dataStr = readFileSync(autoBuildParms).toString('utf8')
-			core.setOutput('automaticBuildJson', dataStr)
-		}
-	} catch (error) {
-		if (error instanceof Error) {
-			core.info(`Fail to read file: automaticBuildParams.txt`)
-			core.info(error.message)
-		}
-	}
-	core.info('New Code End')
+    }    
 
     try {
       const changedProgs = path.join(workpace, 'changedPrograms.json')

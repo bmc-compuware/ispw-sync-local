@@ -6,6 +6,7 @@ import {existsSync, unlinkSync, createWriteStream} from 'fs'
 import {IISPWSyncParms} from './ispw-sync-parms'
 import * as gitCommand from './git-command-helper'
 import {calculateChangedFiles} from './github-restapi-helper'
+import * as fs from 'fs';
 
 export async function getISPWCLIPath(parms: IISPWSyncParms): Promise<string> {
   let topazCLIPath = ''
@@ -59,67 +60,98 @@ export async function execISPWSync(
       throw new Error(`Fail to get input values or environment settings`)
     }
 
-    const curWorkspace = parms.workspace
+    // Resolve the workspace to an absolute and canonical path to prevent directory traversal
+    const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
 
-    const configPath = path.join(curWorkspace, 'ispwcliwk')
-    if (!existsSync(configPath)) {
-      await io.mkdirP(configPath)
+    const configPath = path.join(curWorkspace, 'ispwcliwk');
+    // Prevent path traversal using path.relative() after resolving the real path
+    const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
+
+    if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
+      if (!existsSync(configPath)) {
+        await io.mkdirP(configPath);
+      }
+    } else {
+      core.error("Potential path manipulation detected in configPath");
+      throw new Error("Invalid configPath");
     }
 
-    core.debug(`Check the path: ${configPath}`)
+    core.debug(`Check the path: ${configPath}`);
 
-    const changedPrograms = path.join(curWorkspace, 'changedPrograms.json')
-    core.debug(`Check the file: ${changedPrograms}`)
+    const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
+    const relativeChangedPrograms = path.relative(curWorkspace, fs.realpathSync(changedPrograms));
 
-    try {
-      if (existsSync(changedPrograms)) {
-        try {
-          unlinkSync(changedPrograms)
-          core.info(`Remove obsolete file: ${changedPrograms}`)
-        } catch (error) {
-          if (error instanceof Error) {
-            throw new Error(`Error: ${error.message}`)
+    if (!relativeChangedPrograms.startsWith('..') && !path.isAbsolute(relativeChangedPrograms)) {
+      core.debug(`Check the file: ${changedPrograms}`);
+
+      try {
+        if (existsSync(changedPrograms)) {
+          try {
+            unlinkSync(changedPrograms);
+            core.info(`Remove obsolete file: ${changedPrograms}`);
+          } catch (error) {
+            if (error instanceof Error) {
+              throw new Error(`Error: ${error.message}`);
+            }
           }
         }
+      } catch (error) {
+        core.warning("Error during file removal");
       }
-    } catch (error) {
-      // do nothing
+    } else {
+      core.error("Potential path manipulation detected in changedPrograms");
+      throw new Error("Invalid changedPrograms path");
     }
 
-    const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt')
-    core.debug(`Check file: ${autoBuildParms}`)
-    try {
-      if (existsSync(autoBuildParms)) {
-        try {
-          unlinkSync(autoBuildParms)
-          core.info('Remove obsolete file: ${autoBuildParms}')
-        } catch (error) {
-          if (error instanceof Error) {
-            throw new Error(`Error: ${error.message}`)
+    const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
+    const relativeAutoBuildParms = path.relative(curWorkspace, fs.realpathSync(autoBuildParms));
+
+    if (!relativeAutoBuildParms.startsWith('..') && !path.isAbsolute(relativeAutoBuildParms)) {
+      core.debug(`Check file: ${autoBuildParms}`);
+      try {
+        if (existsSync(autoBuildParms)) {
+          try {
+            unlinkSync(autoBuildParms);
+            core.info('Remove obsolete file: ${autoBuildParms}');
+          } catch (error) {
+            if (error instanceof Error) {
+              throw new Error(`Error: ${error.message}`);
+            }
           }
         }
+      } catch (error) {
+        core.warning("Error during file removal");
       }
-    } catch (error) {
-      // do nothing
-    }
-    const tempHash = path.join(curWorkspace, 'toHash.txt')
-    core.debug(`Check file: ${tempHash}`)
-    try {
-      if (existsSync(tempHash)) {
-        core.info(' Existing obsolete file: ${tempHash}')
-        try {
-          unlinkSync(tempHash)
-          core.info('Remove obsolete file: ${tempHash}')
-        } catch (error) {
-          if (error instanceof Error) {
-            throw new Error(`Error: ${error?.message}`)
-          }
-        }
-      }
-    } catch (error) {
-      // do nothing
+    } else {
+      core.error("Potential path manipulation detected in autoBuildParms");
+      throw new Error("Invalid autoBuildParms path");
     }
 
+    const tempHash = path.join(curWorkspace, 'toHash.txt');
+    const relativeTempHash = path.relative(curWorkspace, fs.realpathSync(tempHash));
+
+    if (!relativeTempHash.startsWith('..') && !path.isAbsolute(relativeTempHash)) {
+      core.debug(`Check file: ${tempHash}`);
+      try {
+        if (existsSync(tempHash)) {
+          core.info(`Existing obsolete file: ${tempHash}`);
+          try {
+            unlinkSync(tempHash);
+            core.info('Remove obsolete file: ${tempHash}');
+          } catch (error) {
+            if (error instanceof Error) {
+              throw new Error(`Error: ${error?.message}`);
+            }
+          }
+        }
+      } catch (error) {
+        core.warning("Error during file removal");
+      }
+    } else {
+      core.error("Potential path manipulation detected in tempHash");
+      throw new Error("Invalid tempHash path");
+    }
+  
     let gitPath
     try {
       gitPath = await gitCommand.getGitPath()
