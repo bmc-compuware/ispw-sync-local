@@ -33,17 +33,35 @@ async function run(): Promise<void> {
 
     //Execution is completed
     try {
-      const autoBuildParms = path.join(workpace, 'automaticBuildParams.txt')
-      if (existsSync(autoBuildParms)) {
-        const dataStr = readFileSync(autoBuildParms).toString('utf8')
-        core.setOutput('automaticBuildJson', dataStr)
+      // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+      const resolvedWorkspace = path.resolve(path.normalize(workpace));
+    
+      // Use path.normalize and validate against the GITHUB_WORKSPACE
+      const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
+    
+      // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
+      const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
+    
+      // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        throw new Error('Potential path traversal detected!');
+      }
+    
+      const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
+      const normalizedAutoBuild = path.normalize(autoBuildParms);
+    
+      // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
+      const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
+      if (!relativeAutoBuild.startsWith('..') && existsSync(normalizedAutoBuild)) {
+        const dataStr = readFileSync(normalizedAutoBuild).toString('utf8');
+        core.setOutput('automaticBuildJson', dataStr);
       }
     } catch (error) {
       if (error instanceof Error) {
-        core.info(`Fail to read file: automaticBuildParams.txt`)
-        core.info(error.message)
+        core.info(`Failed to read file: automaticBuildParams.txt`);
+        core.info(error.message);
       }
-    }
+    }   
 
     try {
       const changedProgs = path.join(workpace, 'changedPrograms.json')
