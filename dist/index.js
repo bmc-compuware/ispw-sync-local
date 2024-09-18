@@ -626,108 +626,101 @@ function execISPWSync(cliPath, parms, cwd) {
                 throw new Error(`Fail to get input values or environment settings`);
             }
             // Resolve the workspace to an absolute and canonical path to prevent directory traversal
-            core.info('Jalaj parms.workspace:'+parms.workspace);
+            core.info('Jalaj parms.workspace:' + parms.workspace);
             const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
-            core.info('Jalaj curWorkspace:'+curWorkspace);
+            core.info('Jalaj curWorkspace:' + curWorkspace);
+            // Define paths
             const configPath = path.join(curWorkspace, 'ispwcliwk');
-            core.info('Jalaj configPath:'+configPath);
-            // Prevent path traversal using path.relative() after resolving the real path
-            if (fs_1.existsSync(configPath)) {
-              core.info('Jalaj configPath If block:');
-              const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
-              if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
-                core.info('Jalaj relativeConfigPath:'+relativeConfigPath);
-                if (!fs_1.existsSync(configPath)) {
-                  yield io.mkdirP(configPath);
-                }
-              }
-            }
-            else {
-              core.info('Jalaj configPath Else block:');
-              yield io.mkdirP(configPath);
-            }
-            core.debug(`Check the path: ${configPath}`);
             const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
-            core.info('Jalaj changedPrograms:'+changedPrograms);
-            const relativeChangedPrograms = path.relative(curWorkspace, fs.realpathSync(changedPrograms));
-            core.info('Jalaj relativeChangedPrograms:'+relativeChangedPrograms);
-            if (!relativeChangedPrograms.startsWith('..') && !path.isAbsolute(relativeChangedPrograms)) {
-                core.debug(`Check the file: ${changedPrograms}`);
-                try {
-                    if (fs_1.existsSync(changedPrograms)) {
-                        try {
-                            fs_1.unlinkSync(changedPrograms);
-                            core.info(`Remove obsolete file: ${changedPrograms}`);
-                        }
-                        catch (error) {
-                            if (error instanceof Error) {
-                                throw new Error(`Error: ${error.message}`);
-                            }
-                        }
-                    }
-                }
-                catch (error) {
-                    core.warning("Error during file removal");
-                }
-            }
-            else {
-                core.error("Potential path manipulation detected in changedPrograms");
-                throw new Error("Invalid changedPrograms path");
-            }
             const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
-            core.info('Jalaj autoBuildParms:'+autoBuildParms);
-            const relativeAutoBuildParms = path.relative(curWorkspace, fs.realpathSync(autoBuildParms));
-            core.info('Jalaj relativeAutoBuildParms:'+relativeAutoBuildParms);
-            if (!relativeAutoBuildParms.startsWith('..') && !path.isAbsolute(relativeAutoBuildParms)) {
-                core.debug(`Check file: ${autoBuildParms}`);
-                try {
-                    if (fs_1.existsSync(autoBuildParms)) {
-                        try {
-                            fs_1.unlinkSync(autoBuildParms);
-                            core.info('Remove obsolete file: ${autoBuildParms}');
-                        }
-                        catch (error) {
-                            if (error instanceof Error) {
-                                throw new Error(`Error: ${error.message}`);
-                            }
-                        }
-                    }
-                }
-                catch (error) {
-                    core.warning("Error during file removal");
-                }
-            }
-            else {
-                core.error("Potential path manipulation detected in autoBuildParms");
-                throw new Error("Invalid autoBuildParms path");
-            }
             const tempHash = path.join(curWorkspace, 'toHash.txt');
-            core.info('Jalaj tempHash:'+tempHash);
-            const relativeTempHash = path.relative(curWorkspace, fs.realpathSync(tempHash));
-            core.info('Jalaj relativeTempHash:'+relativeTempHash);
-            if (!relativeTempHash.startsWith('..') && !path.isAbsolute(relativeTempHash)) {
-                core.debug(`Check file: ${tempHash}`);
-                try {
-                    if (fs_1.existsSync(tempHash)) {
-                        core.info(`Existing obsolete file: ${tempHash}`);
-                        try {
-                            fs_1.unlinkSync(tempHash);
-                            core.info('Remove obsolete file: ${tempHash}');
-                        }
-                        catch (error) {
-                            if (error instanceof Error) {
-                                throw new Error(`Error: ${error === null || error === void 0 ? void 0 : error.message}`);
-                            }
+            core.info('Jalaj configPath:' + configPath);
+            core.info('Jalaj changedPrograms:' + changedPrograms);
+            core.info('Jalaj autoBuildParms:' + autoBuildParms);
+            core.info('Jalaj tempHash:' + tempHash);
+            // Function to check if a file's real path is within the allowed directory
+            const isPathWithinWorkspace = (filePath) => {
+                core.info('Jalaj filePath:' + filePath);
+                const realPath = fs.realpathSync(filePath);
+                core.info('Jalaj RealPath:' + realPath);
+                core.info('Jalaj Returned:' + realPath.startsWith(curWorkspace));
+                return realPath.startsWith(curWorkspace);
+            };
+            // Check and create directory if it does not exist
+            if (!fs_1.existsSync(configPath)) {
+                yield io.mkdirP(configPath);
+                core.info('Jalaj Directory created:' + configPath);
+                core.debug(`Directory created: ${configPath}`);
+            }
+            else {
+                core.info('Jalaj Directory exists:' + configPath);
+                core.debug(`Directory exists: ${configPath}`);
+            }
+            // Check and remove changedPrograms file
+            if (fs_1.existsSync(changedPrograms)) {
+                if (isPathWithinWorkspace(changedPrograms)) {
+                    core.info(`Check file: ${changedPrograms}`);
+                    try {
+                        fs_1.unlinkSync(changedPrograms);
+                        core.info(`Removed obsolete file: ${changedPrograms}`);
+                    }
+                    catch (error) {
+                        if (error instanceof Error) {
+                            core.warning(`Error during file removal: ${error.message}`);
                         }
                     }
                 }
-                catch (error) {
-                    core.warning("Error during file removal");
+                else {
+                    core.error(`Potential path manipulation detected in changedPrograms: ${changedPrograms}`);
+                    throw new Error("Invalid path for changedPrograms");
                 }
             }
             else {
-                core.error("Potential path manipulation detected in tempHash");
-                throw new Error("Invalid tempHash path");
+                core.warning(`File does not exist: ${changedPrograms}`);
+            }
+            // Check and remove autoBuildParms file
+            if (fs_1.existsSync(autoBuildParms)) {
+                if (isPathWithinWorkspace(autoBuildParms)) {
+                    core.info(`Check file: ${autoBuildParms}`);
+                    try {
+                        fs_1.unlinkSync(autoBuildParms);
+                        core.info(`Removed obsolete file: ${autoBuildParms}`);
+                    }
+                    catch (error) {
+                        if (error instanceof Error) {
+                            core.warning(`Error during file removal: ${error.message}`);
+                        }
+                    }
+                }
+                else {
+                    core.error(`Potential path manipulation detected in autoBuildParms: ${autoBuildParms}`);
+                    throw new Error("Invalid path for autoBuildParms");
+                }
+            }
+            else {
+                core.warning(`File does not exist: ${autoBuildParms}`);
+            }
+            // Check and remove tempHash file
+            if (fs_1.existsSync(tempHash)) {
+                if (isPathWithinWorkspace(tempHash)) {
+                    core.info(`Check file: ${tempHash}`);
+                    try {
+                        fs_1.unlinkSync(tempHash);
+                        core.info(`Removed obsolete file: ${tempHash}`);
+                    }
+                    catch (error) {
+                        if (error instanceof Error) {
+                            core.warning(`Error during file removal: ${error.message}`);
+                        }
+                    }
+                }
+                else {
+                    core.error(`Potential path manipulation detected in tempHash: ${tempHash}`);
+                    throw new Error("Invalid path for tempHash");
+                }
+            }
+            else {
+                core.warning(`File does not exist: ${tempHash}`);
             }
             let gitPath;
             try {
@@ -948,34 +941,25 @@ function run() {
                 }
             }
             core.info('Setting up the output values');
-            core.info('Jalaj curWk:'+curWk);
             const workpace = curWk !== null && curWk !== void 0 ? curWk : '';
-            core.info('Jalaj workpace:'+workpace);
             //Execution is completed
             try {
                 // Normalize and resolve the workspace path to ensure it's absolute and sanitized
                 const resolvedWorkspace = path.resolve(path.normalize(workpace));
-                core.info('Jalaj resolvedWorkspace:'+resolvedWorkspace);
                 // Use path.normalize and validate against the GITHUB_WORKSPACE
                 const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
-                core.info('Jalaj normalizedWorkspace:'+normalizedWorkspace);
                 // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
                 const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
-                core.info('Jalaj relativePath:'+relativePath);
                 // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
                 if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
                     throw new Error('Potential path traversal detected!');
                 }
                 const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-                core.info('Jalaj autoBuildParms:'+autoBuildParms);
                 const normalizedAutoBuild = path.normalize(autoBuildParms);
-                core.info('Jalaj normalizedAutoBuild:'+normalizedAutoBuild);
                 // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
                 const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
-                core.info('Jalaj relativeAutoBuild:'+relativeAutoBuild);
                 if (!relativeAutoBuild.startsWith('..') && fs_1.existsSync(normalizedAutoBuild)) {
                     const dataStr = fs_1.readFileSync(normalizedAutoBuild).toString('utf8');
-                    core.info('Jalaj dataStr:'+dataStr);
                     core.setOutput('automaticBuildJson', dataStr);
                 }
             }
