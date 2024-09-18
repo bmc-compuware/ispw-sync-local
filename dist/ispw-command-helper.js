@@ -84,15 +84,16 @@ function execISPWSync(cliPath, parms, cwd) {
             const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
             const configPath = path.join(curWorkspace, 'ispwcliwk');
             // Prevent path traversal using path.relative() after resolving the real path
-            const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
-            if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
-                if (!fs_1.existsSync(configPath)) {
-                    yield io.mkdirP(configPath);
+            if (fs_1.existsSync(configPath)) {
+                const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
+                if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
+                    if (!fs_1.existsSync(configPath)) {
+                        yield io.mkdirP(configPath);
+                    }
                 }
             }
             else {
-                core.error("Potential path manipulation detected in configPath");
-                throw new Error("Invalid configPath");
+                yield io.mkdirP(configPath);
             }
             core.debug(`Check the path: ${configPath}`);
             const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');

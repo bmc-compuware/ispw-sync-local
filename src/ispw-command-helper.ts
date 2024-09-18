@@ -64,16 +64,19 @@ export async function execISPWSync(
     const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
 
     const configPath = path.join(curWorkspace, 'ispwcliwk');
-    // Prevent path traversal using path.relative() after resolving the real path
-    const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
 
-    if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
-      if (!existsSync(configPath)) {
-        await io.mkdirP(configPath);
+    // Prevent path traversal using path.relative() after resolving the real path
+    if (existsSync(configPath)) {
+      const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
+      if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
+        if (!existsSync(configPath)) {
+          await io.mkdirP(configPath);
+        }
       }
-    } else {
-      core.error("Potential path manipulation detected in configPath");
-      throw new Error("Invalid configPath");
+    }
+    else
+    {
+      await io.mkdirP(configPath);
     }
 
     core.debug(`Check the path: ${configPath}`);
