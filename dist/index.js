@@ -7747,66 +7747,107 @@
                   core.debug('Fail to get input values or environment settings');
                   throw new Error(`Fail to get input values or environment settings`);
               }
-              const curWorkspace = parms.workspace;
+              // Resolve the workspace to an absolute and canonical path to prevent directory traversal
+              console.log("Jalaj parms.workspace:"+parms.workspace);
+              const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
+              console.log("Jalaj curWorkspace:"+curWorkspace);
               const configPath = path.join(curWorkspace, 'ispwcliwk');
-              if (!fs_1.existsSync(configPath)) {
-                  yield io.mkdirP(configPath);
+              console.log("Jalaj configPath:"+configPath);
+              // Prevent path traversal using path.relative() after resolving the real path
+              const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
+              console.log("Jalaj relativeConfigPath:"+relativeConfigPath);
+              if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
+                  if (!fs_1.existsSync(configPath)) {
+                    console.log("Jalaj configPath:"+configPath);
+                      yield io.mkdirP(configPath);
+                  }
+              }
+              else {
+                  core.error("Potential path manipulation detected in configPath");
+                  throw new Error("Invalid configPath");
               }
               core.debug(`Check the path: ${configPath}`);
               const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
-              core.debug(`Check the file: ${changedPrograms}`);
-              try {
-                  if (fs_1.existsSync(changedPrograms)) {
-                      try {
-                          fs_1.unlinkSync(changedPrograms);
-                          core.info(`Remove obsolete file: ${changedPrograms}`);
-                      }
-                      catch (error) {
-                          if (error instanceof Error) {
-                              throw new Error(`Error: ${error.message}`);
+              console.log("Jalaj changedPrograms:"+changedPrograms);
+              const relativeChangedPrograms = path.relative(curWorkspace, fs.realpathSync(changedPrograms));
+              console.log("Jalaj relativeChangedPrograms:"+relativeChangedPrograms);
+              if (!relativeChangedPrograms.startsWith('..') && !path.isAbsolute(relativeChangedPrograms)) {
+                  core.debug(`Check the file: ${changedPrograms}`);
+                  try {
+                      if (fs_1.existsSync(changedPrograms)) {
+                          try {
+                              fs_1.unlinkSync(changedPrograms);
+                              core.info(`Remove obsolete file: ${changedPrograms}`);
+                          }
+                          catch (error) {
+                              if (error instanceof Error) {
+                                  throw new Error(`Error: ${error.message}`);
+                              }
                           }
                       }
                   }
+                  catch (error) {
+                      core.warning("Error during file removal");
+                  }
               }
-              catch (error) {
-                  // do nothing
+              else {
+                  core.error("Potential path manipulation detected in changedPrograms");
+                  throw new Error("Invalid changedPrograms path");
               }
               const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
-              core.debug(`Check file: ${autoBuildParms}`);
-              try {
-                  if (fs_1.existsSync(autoBuildParms)) {
-                      try {
-                          fs_1.unlinkSync(autoBuildParms);
-                          core.info('Remove obsolete file: ${autoBuildParms}');
-                      }
-                      catch (error) {
-                          if (error instanceof Error) {
-                              throw new Error(`Error: ${error.message}`);
+              console.log("Jalaj autoBuildParms:"+autoBuildParms);
+              const relativeAutoBuildParms = path.relative(curWorkspace, fs.realpathSync(autoBuildParms));
+              console.log("Jalaj relativeAutoBuildParms:"+relativeAutoBuildParms);
+              if (!relativeAutoBuildParms.startsWith('..') && !path.isAbsolute(relativeAutoBuildParms)) {
+                  core.debug(`Check file: ${autoBuildParms}`);
+                  try {
+                      if (fs_1.existsSync(autoBuildParms)) {
+                          try {
+                              fs_1.unlinkSync(autoBuildParms);
+                              core.info('Remove obsolete file: ${autoBuildParms}');
+                          }
+                          catch (error) {
+                              if (error instanceof Error) {
+                                  throw new Error(`Error: ${error.message}`);
+                              }
                           }
                       }
                   }
+                  catch (error) {
+                      core.warning("Error during file removal");
+                  }
               }
-              catch (error) {
-                  // do nothing
+              else {
+                  core.error("Potential path manipulation detected in autoBuildParms");
+                  throw new Error("Invalid autoBuildParms path");
               }
               const tempHash = path.join(curWorkspace, 'toHash.txt');
-              core.debug(`Check file: ${tempHash}`);
-              try {
-                  if (fs_1.existsSync(tempHash)) {
-                      core.info(' Existing obsolete file: ${tempHash}');
-                      try {
-                          fs_1.unlinkSync(tempHash);
-                          core.info('Remove obsolete file: ${tempHash}');
-                      }
-                      catch (error) {
-                          if (error instanceof Error) {
-                              throw new Error(`Error: ${error === null || error === void 0 ? void 0 : error.message}`);
+              console.log("Jalaj tempHash:"+tempHash);
+              const relativeTempHash = path.relative(curWorkspace, fs.realpathSync(tempHash));
+              console.log("Jalaj relativeTempHash:"+relativeTempHash);
+              if (!relativeTempHash.startsWith('..') && !path.isAbsolute(relativeTempHash)) {
+                  core.debug(`Check file: ${tempHash}`);
+                  try {
+                      if (fs_1.existsSync(tempHash)) {
+                          core.info(`Existing obsolete file: ${tempHash}`);
+                          try {
+                              fs_1.unlinkSync(tempHash);
+                              core.info('Remove obsolete file: ${tempHash}');
+                          }
+                          catch (error) {
+                              if (error instanceof Error) {
+                                  throw new Error(`Error: ${error === null || error === void 0 ? void 0 : error.message}`);
+                              }
                           }
                       }
                   }
+                  catch (error) {
+                      core.warning("Error during file removal");
+                  }
               }
-              catch (error) {
-                  // do nothing
+              else {
+                  core.error("Potential path manipulation detected in tempHash");
+                  throw new Error("Invalid tempHash path");
               }
               let gitPath;
               try {
@@ -8032,15 +8073,36 @@
               const workpace = curWk !== null && curWk !== void 0 ? curWk : '';
               //Execution is completed
               try {
-                  const autoBuildParms = path.join(workpace, 'automaticBuildParams.txt');
-                  if (fs_1.existsSync(autoBuildParms)) {
-                      const dataStr = fs_1.readFileSync(autoBuildParms).toString('utf8');
-                      core.setOutput('automaticBuildJson', dataStr);
-                  }
+                // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+                console.log('Jalaj workpace:'+workpace);
+                const resolvedWorkspace = path.resolve(path.normalize(workpace));
+                console.log('Jalaj resolvedWorkspace:'+resolvedWorkspace);
+                // Use path.normalize and validate against the GITHUB_WORKSPACE
+                const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
+                console.log('Jalaj normalizedWorkspace:'+normalizedWorkspace);
+                // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
+                const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
+                console.log('Jalaj relativePath:'+relativePath);
+                // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+                if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+                    throw new Error('Potential path traversal detected!');
+                }
+                const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
+                console.log('Jalaj autoBuildParms:'+autoBuildParms);
+                const normalizedAutoBuild = path.normalize(autoBuildParms);
+                console.log('Jalaj normalizedAutoBuild:'+normalizedAutoBuild);
+                // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
+                const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
+                console.log('Jalaj relativeAutoBuild:'+relativeAutoBuild);
+                if (!relativeAutoBuild.startsWith('..') && fs_1.existsSync(normalizedAutoBuild)) {
+                    const dataStr = fs_1.readFileSync(normalizedAutoBuild).toString('utf8');
+                    console.log('Jalaj dataStr:'+dataStr);
+                    core.setOutput('automaticBuildJson', dataStr);
+                }
               }
               catch (error) {
                   if (error instanceof Error) {
-                      core.info(`Fail to read file: automaticBuildParams.txt`);
+                      core.info(`Failed to read file: automaticBuildParams.txt`);
                       core.info(error.message);
                   }
               }
