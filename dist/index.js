@@ -626,10 +626,14 @@ function execISPWSync(cliPath, parms, cwd) {
                 throw new Error(`Fail to get input values or environment settings`);
             }
             // Resolve the workspace to an absolute and canonical path to prevent directory traversal
+            core.info('Jalaj parms.workspace:'+parms.workspace);
             const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
+            core.info('Jalaj curWorkspace:'+curWorkspace);
             const configPath = path.join(curWorkspace, 'ispwcliwk');
+            core.info('Jalaj configPath:'+configPath);
             // Prevent path traversal using path.relative() after resolving the real path
             const relativeConfigPath = path.relative(curWorkspace, fs.realpathSync(configPath));
+            core.info('Jalaj relativeConfigPath:'+relativeConfigPath);
             if (!relativeConfigPath.startsWith('..') && !path.isAbsolute(relativeConfigPath)) {
                 if (!fs_1.existsSync(configPath)) {
                     yield io.mkdirP(configPath);
@@ -641,7 +645,9 @@ function execISPWSync(cliPath, parms, cwd) {
             }
             core.debug(`Check the path: ${configPath}`);
             const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
+            core.info('Jalaj changedPrograms:'+changedPrograms);
             const relativeChangedPrograms = path.relative(curWorkspace, fs.realpathSync(changedPrograms));
+            core.info('Jalaj relativeChangedPrograms:'+relativeChangedPrograms);
             if (!relativeChangedPrograms.startsWith('..') && !path.isAbsolute(relativeChangedPrograms)) {
                 core.debug(`Check the file: ${changedPrograms}`);
                 try {
@@ -666,7 +672,9 @@ function execISPWSync(cliPath, parms, cwd) {
                 throw new Error("Invalid changedPrograms path");
             }
             const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
+            core.info('Jalaj autoBuildParms:'+autoBuildParms);
             const relativeAutoBuildParms = path.relative(curWorkspace, fs.realpathSync(autoBuildParms));
+            core.info('Jalaj relativeAutoBuildParms:'+relativeAutoBuildParms);
             if (!relativeAutoBuildParms.startsWith('..') && !path.isAbsolute(relativeAutoBuildParms)) {
                 core.debug(`Check file: ${autoBuildParms}`);
                 try {
@@ -691,7 +699,9 @@ function execISPWSync(cliPath, parms, cwd) {
                 throw new Error("Invalid autoBuildParms path");
             }
             const tempHash = path.join(curWorkspace, 'toHash.txt');
+            core.info('Jalaj tempHash:'+tempHash);
             const relativeTempHash = path.relative(curWorkspace, fs.realpathSync(tempHash));
+            core.info('Jalaj relativeTempHash:'+relativeTempHash);
             if (!relativeTempHash.startsWith('..') && !path.isAbsolute(relativeTempHash)) {
                 core.debug(`Check file: ${tempHash}`);
                 try {
@@ -935,25 +945,34 @@ function run() {
                 }
             }
             core.info('Setting up the output values');
+            core.info('Jalaj curWk:'+curWk);
             const workpace = curWk !== null && curWk !== void 0 ? curWk : '';
+            core.info('Jalaj workpace:'+workpace);
             //Execution is completed
             try {
                 // Normalize and resolve the workspace path to ensure it's absolute and sanitized
                 const resolvedWorkspace = path.resolve(path.normalize(workpace));
+                core.info('Jalaj resolvedWorkspace:'+resolvedWorkspace);
                 // Use path.normalize and validate against the GITHUB_WORKSPACE
                 const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
+                core.info('Jalaj normalizedWorkspace:'+normalizedWorkspace);
                 // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
                 const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
+                core.info('Jalaj relativePath:'+relativePath);
                 // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
                 if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
                     throw new Error('Potential path traversal detected!');
                 }
                 const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
+                core.info('Jalaj autoBuildParms:'+autoBuildParms);
                 const normalizedAutoBuild = path.normalize(autoBuildParms);
+                core.info('Jalaj normalizedAutoBuild:'+normalizedAutoBuild);
                 // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
                 const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
+                core.info('Jalaj relativeAutoBuild:'+relativeAutoBuild);
                 if (!relativeAutoBuild.startsWith('..') && fs_1.existsSync(normalizedAutoBuild)) {
                     const dataStr = fs_1.readFileSync(normalizedAutoBuild).toString('utf8');
+                    core.info('Jalaj dataStr:'+dataStr);
                     core.setOutput('automaticBuildJson', dataStr);
                 }
             }
