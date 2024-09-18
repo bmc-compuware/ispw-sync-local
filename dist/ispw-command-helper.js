@@ -81,35 +81,24 @@ function execISPWSync(cliPath, parms, cwd) {
                 throw new Error(`Fail to get input values or environment settings`);
             }
             // Resolve the workspace to an absolute and canonical path to prevent directory traversal
-            core.info('Jalaj parms.workspace:' + parms.workspace);
             const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
-            core.info('Jalaj curWorkspace:' + curWorkspace);
             // Define paths
             const configPath = path.join(curWorkspace, 'ispwcliwk');
             const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
             const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
             const tempHash = path.join(curWorkspace, 'toHash.txt');
-            core.info('Jalaj configPath:' + configPath);
-            core.info('Jalaj changedPrograms:' + changedPrograms);
-            core.info('Jalaj autoBuildParms:' + autoBuildParms);
-            core.info('Jalaj tempHash:' + tempHash);
             // Function to check if a file's real path is within the allowed directory
             const isPathWithinWorkspace = (filePath) => {
-                core.info('Jalaj filePath:' + filePath);
                 const realPath = fs.realpathSync(filePath);
-                core.info('Jalaj RealPath:' + realPath);
-                core.info('Jalaj Returned:' + realPath.startsWith(curWorkspace));
                 return realPath.startsWith(curWorkspace);
             };
             // Check and create directory if it does not exist
             if (!fs_1.existsSync(configPath)) {
                 yield io.mkdirP(configPath);
-                core.info('Jalaj Directory created:' + configPath);
-                core.debug(`Directory created: ${configPath}`);
+                core.info(`Directory created: ${configPath}`);
             }
             else {
-                core.info('Jalaj Directory exists:' + configPath);
-                core.debug(`Directory exists: ${configPath}`);
+                core.info(`Directory exists: ${configPath}`);
             }
             // Check and remove changedPrograms file
             if (fs_1.existsSync(changedPrograms)) {
@@ -131,7 +120,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
             }
             else {
-                core.warning(`File does not exist: ${changedPrograms}`);
+                core.info(`File does not exist: ${changedPrograms}`);
             }
             // Check and remove autoBuildParms file
             if (fs_1.existsSync(autoBuildParms)) {
@@ -153,7 +142,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
             }
             else {
-                core.warning(`File does not exist: ${autoBuildParms}`);
+                core.info(`File does not exist: ${autoBuildParms}`);
             }
             // Check and remove tempHash file
             if (fs_1.existsSync(tempHash)) {
@@ -175,7 +164,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
             }
             else {
-                core.warning(`File does not exist: ${tempHash}`);
+                core.info(`File does not exist: ${tempHash}`);
             }
             let gitPath;
             try {

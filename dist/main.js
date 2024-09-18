@@ -33,6 +33,7 @@ const ispw_command_helper_1 = require("./ispw-command-helper");
 const input_helper_1 = require("./input-helper");
 const fs_1 = require("fs");
 const path = __importStar(require("path"));
+const fs = __importStar(require("fs"));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -63,21 +64,23 @@ function run() {
             try {
                 // Normalize and resolve the workspace path to ensure it's absolute and sanitized
                 const resolvedWorkspace = path.resolve(path.normalize(workpace));
-                // Use path.normalize and validate against the GITHUB_WORKSPACE
-                const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
-                // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
-                const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
+                // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+                const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
+                const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
                 // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
                 if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
                     throw new Error('Potential path traversal detected!');
                 }
                 const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-                const normalizedAutoBuild = path.normalize(autoBuildParms);
-                // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
-                const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
-                if (!relativeAutoBuild.startsWith('..') && fs_1.existsSync(normalizedAutoBuild)) {
-                    const dataStr = fs_1.readFileSync(normalizedAutoBuild).toString('utf8');
+                const realAutoBuildParms = fs.realpathSync(autoBuildParms);
+                // Ensure that autoBuildParms is within the resolvedWorkspace
+                const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
+                if (!relativeAutoBuild.startsWith('..') && !path.isAbsolute(relativeAutoBuild) && fs_1.existsSync(realAutoBuildParms)) {
+                    const dataStr = fs_1.readFileSync(realAutoBuildParms, 'utf8');
                     core.setOutput('automaticBuildJson', dataStr);
+                }
+                else {
+                    core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
                 }
             }
             catch (error) {

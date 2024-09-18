@@ -61,38 +61,26 @@ export async function execISPWSync(
     }
 
     // Resolve the workspace to an absolute and canonical path to prevent directory traversal
-    core.info('Jalaj parms.workspace:'+parms.workspace);
     const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
-    core.info('Jalaj curWorkspace:'+curWorkspace);
 
     // Define paths
     const configPath = path.join(curWorkspace, 'ispwcliwk');
     const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
     const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
     const tempHash = path.join(curWorkspace, 'toHash.txt');
-    core.info('Jalaj configPath:'+configPath);
-    core.info('Jalaj changedPrograms:'+changedPrograms);
-    core.info('Jalaj autoBuildParms:'+autoBuildParms);
-    core.info('Jalaj tempHash:'+tempHash);
-    
 
     // Function to check if a file's real path is within the allowed directory
     const isPathWithinWorkspace = (filePath: string) => {
-      core.info('Jalaj filePath:'+filePath);
       const realPath = fs.realpathSync(filePath);
-      core.info('Jalaj RealPath:'+realPath);
-      core.info('Jalaj Returned:'+realPath.startsWith(curWorkspace));
       return realPath.startsWith(curWorkspace);
     };
 
     // Check and create directory if it does not exist
     if (!existsSync(configPath)) {
       await io.mkdirP(configPath);
-      core.info('Jalaj Directory created:'+configPath);
-      core.debug(`Directory created: ${configPath}`);
+      core.info(`Directory created: ${configPath}`);
     } else {
-      core.info('Jalaj Directory exists:'+configPath);
-      core.debug(`Directory exists: ${configPath}`);
+      core.info(`Directory exists: ${configPath}`);
     }
 
     // Check and remove changedPrograms file
@@ -112,7 +100,7 @@ export async function execISPWSync(
         throw new Error("Invalid path for changedPrograms");
       }
     } else {
-      core.warning(`File does not exist: ${changedPrograms}`);
+      core.info(`File does not exist: ${changedPrograms}`);
     }
 
     // Check and remove autoBuildParms file
@@ -132,7 +120,7 @@ export async function execISPWSync(
         throw new Error("Invalid path for autoBuildParms");
       }
     } else {
-      core.warning(`File does not exist: ${autoBuildParms}`);
+      core.info(`File does not exist: ${autoBuildParms}`);
     }
 
     // Check and remove tempHash file
@@ -152,7 +140,7 @@ export async function execISPWSync(
         throw new Error("Invalid path for tempHash");
       }
     } else {
-      core.warning(`File does not exist: ${tempHash}`);
+      core.info(`File does not exist: ${tempHash}`);
     }
   
     let gitPath

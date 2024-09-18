@@ -3,6 +3,8 @@ import {execISPWSync, getISPWCLIPath} from './ispw-command-helper'
 import {getInputs} from './input-helper'
 import {existsSync, readFileSync} from 'fs'
 import * as path from 'path'
+import * as fs from 'fs';
+
 async function run(): Promise<void> {
   try {
     const curWk = process.env.GITHUB_WORKSPACE
@@ -36,11 +38,9 @@ async function run(): Promise<void> {
       // Normalize and resolve the workspace path to ensure it's absolute and sanitized
       const resolvedWorkspace = path.resolve(path.normalize(workpace));
     
-      // Use path.normalize and validate against the GITHUB_WORKSPACE
-      const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
-    
-      // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
-      const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
+      // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+      const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
+      const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
     
       // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
       if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
@@ -48,21 +48,23 @@ async function run(): Promise<void> {
       }
     
       const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-      const normalizedAutoBuild = path.normalize(autoBuildParms);
+      const realAutoBuildParms = fs.realpathSync(autoBuildParms);
     
-      // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
-      const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
-      if (!relativeAutoBuild.startsWith('..') && existsSync(normalizedAutoBuild)) {
-        const dataStr = readFileSync(normalizedAutoBuild).toString('utf8');
+      // Ensure that autoBuildParms is within the resolvedWorkspace
+      const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
+      if (!relativeAutoBuild.startsWith('..') && !path.isAbsolute(relativeAutoBuild) && existsSync(realAutoBuildParms)) {
+        const dataStr = readFileSync(realAutoBuildParms, 'utf8');
         core.setOutput('automaticBuildJson', dataStr);
+      } else {
+        core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
       }
     } catch (error) {
       if (error instanceof Error) {
         core.info(`Failed to read file: automaticBuildParams.txt`);
         core.info(error.message);
       }
-    }   
-
+    }
+    
     try {
       const changedProgs = path.join(workpace, 'changedPrograms.json')
       if (existsSync(changedProgs)) {

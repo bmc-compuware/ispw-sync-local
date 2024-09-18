@@ -626,35 +626,24 @@ function execISPWSync(cliPath, parms, cwd) {
                 throw new Error(`Fail to get input values or environment settings`);
             }
             // Resolve the workspace to an absolute and canonical path to prevent directory traversal
-            core.info('Jalaj parms.workspace:' + parms.workspace);
             const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
-            core.info('Jalaj curWorkspace:' + curWorkspace);
             // Define paths
             const configPath = path.join(curWorkspace, 'ispwcliwk');
             const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
             const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
             const tempHash = path.join(curWorkspace, 'toHash.txt');
-            core.info('Jalaj configPath:' + configPath);
-            core.info('Jalaj changedPrograms:' + changedPrograms);
-            core.info('Jalaj autoBuildParms:' + autoBuildParms);
-            core.info('Jalaj tempHash:' + tempHash);
             // Function to check if a file's real path is within the allowed directory
             const isPathWithinWorkspace = (filePath) => {
-                core.info('Jalaj filePath:' + filePath);
                 const realPath = fs.realpathSync(filePath);
-                core.info('Jalaj RealPath:' + realPath);
-                core.info('Jalaj Returned:' + realPath.startsWith(curWorkspace));
                 return realPath.startsWith(curWorkspace);
             };
             // Check and create directory if it does not exist
             if (!fs_1.existsSync(configPath)) {
                 yield io.mkdirP(configPath);
-                core.info('Jalaj Directory created:' + configPath);
-                core.debug(`Directory created: ${configPath}`);
+                core.info(`Directory created: ${configPath}`);
             }
             else {
-                core.info('Jalaj Directory exists:' + configPath);
-                core.debug(`Directory exists: ${configPath}`);
+                core.info(`Directory exists: ${configPath}`);
             }
             // Check and remove changedPrograms file
             if (fs_1.existsSync(changedPrograms)) {
@@ -676,7 +665,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
             }
             else {
-                core.warning(`File does not exist: ${changedPrograms}`);
+                core.info(`File does not exist: ${changedPrograms}`);
             }
             // Check and remove autoBuildParms file
             if (fs_1.existsSync(autoBuildParms)) {
@@ -698,7 +687,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
             }
             else {
-                core.warning(`File does not exist: ${autoBuildParms}`);
+                core.info(`File does not exist: ${autoBuildParms}`);
             }
             // Check and remove tempHash file
             if (fs_1.existsSync(tempHash)) {
@@ -720,7 +709,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
             }
             else {
-                core.warning(`File does not exist: ${tempHash}`);
+                core.info(`File does not exist: ${tempHash}`);
             }
             let gitPath;
             try {
@@ -916,6 +905,7 @@ const ispw_command_helper_1 = __nccwpck_require__(3018);
 const input_helper_1 = __nccwpck_require__(300);
 const fs_1 = __nccwpck_require__(7147);
 const path = __importStar(__nccwpck_require__(1017));
+const fs = __importStar(__nccwpck_require__(7147));
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -946,21 +936,23 @@ function run() {
             try {
                 // Normalize and resolve the workspace path to ensure it's absolute and sanitized
                 const resolvedWorkspace = path.resolve(path.normalize(workpace));
-                // Use path.normalize and validate against the GITHUB_WORKSPACE
-                const normalizedWorkspace = path.normalize(process.env.GITHUB_WORKSPACE || '');
-                // Use path.relative() to check if resolvedWorkspace is within the GITHUB_WORKSPACE
-                const relativePath = path.relative(normalizedWorkspace, resolvedWorkspace);
+                // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+                const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
+                const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
                 // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
                 if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
                     throw new Error('Potential path traversal detected!');
                 }
                 const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-                const normalizedAutoBuild = path.normalize(autoBuildParms);
-                // Validate that autoBuildParms is within resolvedWorkspace by comparing normalized paths
-                const relativeAutoBuild = path.relative(resolvedWorkspace, normalizedAutoBuild);
-                if (!relativeAutoBuild.startsWith('..') && fs_1.existsSync(normalizedAutoBuild)) {
-                    const dataStr = fs_1.readFileSync(normalizedAutoBuild).toString('utf8');
+                const realAutoBuildParms = fs.realpathSync(autoBuildParms);
+                // Ensure that autoBuildParms is within the resolvedWorkspace
+                const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
+                if (!relativeAutoBuild.startsWith('..') && !path.isAbsolute(relativeAutoBuild) && fs_1.existsSync(realAutoBuildParms)) {
+                    const dataStr = fs_1.readFileSync(realAutoBuildParms, 'utf8');
                     core.setOutput('automaticBuildJson', dataStr);
+                }
+                else {
+                    core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
                 }
             }
             catch (error) {
