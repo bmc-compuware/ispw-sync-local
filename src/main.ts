@@ -1,9 +1,9 @@
 import * as core from '@actions/core'
 import {execISPWSync, getISPWCLIPath} from './ispw-command-helper'
-import {getInputs} from './input-helper'
+import {getInputs, checkForHarmfulCharAndWords} from './input-helper'
 import {existsSync, readFileSync} from 'fs'
 import * as path from 'path'
-import * as fs from 'fs';
+import * as fs from 'fs'
 
 async function run(): Promise<void> {
   try {
@@ -35,36 +35,57 @@ async function run(): Promise<void> {
 
     //Execution is completed
     try {
-      // Normalize and resolve the workspace path to ensure it's absolute and sanitized
-      const resolvedWorkspace = path.resolve(path.normalize(workpace));
-    
-      // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
-      const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
-      const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
-    
-      // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
-      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-        throw new Error('Potential path traversal detected!');
-      }
-    
-      const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-      const realAutoBuildParms = fs.realpathSync(autoBuildParms);
-    
-      // Ensure that autoBuildParms is within the resolvedWorkspace
-      const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
-      if (!relativeAutoBuild.startsWith('..') && !path.isAbsolute(relativeAutoBuild) && existsSync(realAutoBuildParms)) {
-        const dataStr = readFileSync(realAutoBuildParms, 'utf8');
-        core.setOutput('automaticBuildJson', dataStr);
+      //if (allowedCharsRegex.test(workpace)) {
+      if (checkForHarmfulCharAndWords(workpace)) {
+        // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+        const resolvedWorkspace = path.resolve(path.normalize(workpace))
+
+        // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+        const baseWorkspace = path.resolve(
+          path.normalize(process.env.GITHUB_WORKSPACE || '')
+        )
+        const relativePath = path.relative(baseWorkspace, resolvedWorkspace)
+
+        // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+        if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+          throw new Error('Potential path traversal detected!')
+        }
+
+        const autoBuildParms = path.join(
+          resolvedWorkspace,
+          'automaticBuildParams.txt'
+        )
+        const realAutoBuildParms = fs.realpathSync(autoBuildParms)
+
+        // Ensure that autoBuildParms is within the resolvedWorkspace
+        const relativeAutoBuild = path.relative(
+          resolvedWorkspace,
+          realAutoBuildParms
+        )
+        if (
+          !relativeAutoBuild.startsWith('..') &&
+          !path.isAbsolute(relativeAutoBuild) &&
+          existsSync(realAutoBuildParms)
+        ) {
+          const dataStr = readFileSync(realAutoBuildParms, 'utf8')
+          core.setOutput('automaticBuildJson', dataStr)
+        } else {
+          core.warning(
+            `Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`
+          )
+        }
       } else {
-        core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
+        throw new Error(
+          `Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`
+        )
       }
     } catch (error) {
       if (error instanceof Error) {
-        core.info(`Failed to read file: automaticBuildParams.txt`);
-        core.info(error.message);
+        core.info(`Failed to read file: automaticBuildParams.txt`)
+        core.info(error.message)
       }
     }
-    
+
     try {
       const changedProgs = path.join(workpace, 'changedPrograms.json')
       if (existsSync(changedProgs)) {

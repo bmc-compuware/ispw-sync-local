@@ -45,24 +45,25 @@ export function getInputs(): IISPWSyncParms {
   result.stream = core.getInput('stream', {required: true})
   result.application = core.getInput('application', {required: true})
   result.subAppl = core.getInput('subAppl', {required: false})
-  result.ispwConfigPath = core.getInput('ispwConfigPath',{required:false})
+  result.ispwConfigPath = core.getInput('ispwConfigPath', {required: false})
   result.checkoutLevel = core.getInput('checkoutLevel', {required: true})
-  result.assignmentPrefix =core.getInput('assignmentPrefix',{required:false})
-  result.gitCommitFile =core.getInput('gitCommitFile',{required:false})
-  
+  result.assignmentPrefix = core.getInput('assignmentPrefix', {required: false})
+  result.gitCommitFile = core.getInput('gitCommitFile', {required: false})
+
   let gitFromHash = core.getInput('gitFromHash')
   let gitCommit = core.getInput('gitCommit')
-  
-  if((gitFromHash && !gitCommit) ||(!gitFromHash && gitCommit))
-  {
-		throw new Error('gitCommit and gitFromHash variables need to be defined together')
+
+  if ((gitFromHash && !gitCommit) || (!gitFromHash && gitCommit)) {
+    throw new Error(
+      'gitCommit and gitFromHash variables need to be defined together'
+    )
   }
 
   if (!gitFromHash) {
     gitFromHash = '-1'
   }
   result.gitFromHash = gitFromHash
-  
+
   if (!gitCommit) {
     gitCommit = github.context.sha
   }
@@ -73,7 +74,7 @@ export function getInputs(): IISPWSyncParms {
     gitLocalPath = githubWorkspacePath
   }
   result.gitLocalPath = gitLocalPath
-  
+
   result.gitUid = core.getInput('gitUid', {required: true})
   result.gitToken = core.getInput('gitToken', {required: true})
 
@@ -105,7 +106,7 @@ export function getInputs(): IISPWSyncParms {
   if (ref && ref.startsWith('refs/heads/')) {
     ref = ref.substring('refs/heads/'.length)
   }
- 
+
   let gitBranch = core.getInput('gitBranch')
   if (!gitBranch) {
     gitBranch = ref
@@ -235,4 +236,40 @@ export async function validatePath(aPath: string): Promise<void> {
       `Encountered an error when checking whether path '${aPath}' exists.`
     )
   }
+}
+
+/**
+ * Function that checks if the input string contains the word 'safe'.
+ * @param input The string to check
+ * @returns { boolean } Returns true if 'safe' is found in the input string, otherwise false.
+ */
+export function checkForHarmfulCharAndWords(input: string): boolean {
+  // eslint-disable-next-line no-useless-escape
+  const harmfulCharsRegex = /^[a-zA-Z0-9_\-\.\/\\]+$/g
+
+  const harmfulWords = [
+    'config',
+    'bin',
+    'secret',
+    'password',
+    'admin',
+    'backup',
+    'restricted',
+    'bin'
+  ]
+
+  // Check for harmful characters using the regex
+  if (harmfulCharsRegex.test(input)) {
+    return false // Harmful character found
+  }
+
+  // Check for harmful words in the input string
+  const inputLowerCase = input.toLowerCase() // Convert the input to lowercase for case-insensitive comparison
+  for (const word of harmfulWords) {
+    if (inputLowerCase.includes(word.toLowerCase())) {
+      return false // Harmful word found
+    }
+  }
+
+  return true // No harmful characters or words found
 }
