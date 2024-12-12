@@ -6,7 +6,8 @@ import {existsSync, unlinkSync, createWriteStream} from 'fs'
 import {IISPWSyncParms} from './ispw-sync-parms'
 import * as gitCommand from './git-command-helper'
 import {calculateChangedFiles} from './github-restapi-helper'
-import * as fs from 'fs';
+import * as fs from 'fs'
+import {checkForHarmfulCharAndWords} from './input-helper'
 
 export async function getISPWCLIPath(parms: IISPWSyncParms): Promise<string> {
   let topazCLIPath = ''
@@ -60,224 +61,236 @@ export async function execISPWSync(
       throw new Error(`Fail to get input values or environment settings`)
     }
 
-    // Resolve the workspace to an absolute and canonical path to prevent directory traversal
-    const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
+    if (checkForHarmfulCharAndWords(parms.workspace)) {
+      // Resolve the workspace to an absolute and canonical path to prevent directory traversal
+      const curWorkspace = fs.realpathSync(path.resolve(parms.workspace))
 
-    // Define paths
-    const configPath = path.join(curWorkspace, 'ispwcliwk');
-    const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
-    const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
-    const tempHash = path.join(curWorkspace, 'toHash.txt');
+      // Define paths
+      const configPath = path.join(curWorkspace, 'ispwcliwk')
+      const changedPrograms = path.join(curWorkspace, 'changedPrograms.json')
+      const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt')
+      const tempHash = path.join(curWorkspace, 'toHash.txt')
 
-    // Function to check if a file's real path is within the allowed directory
-    const isPathWithinWorkspace = (filePath: string) => {
-      const realPath = fs.realpathSync(filePath);
-      return realPath.startsWith(curWorkspace);
-    };
+      // Function to check if a file's real path is within the allowed directory
+      // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+      const isPathWithinWorkspace = (filePath: string) => {
+        const realPath = fs.realpathSync(filePath)
+        return realPath.startsWith(curWorkspace)
+      }
 
-    // Check and create directory if it does not exist
-    if (!existsSync(configPath)) {
-      await io.mkdirP(configPath);
-      core.info(`Directory created: ${configPath}`);
-    } else {
-      core.info(`Directory exists: ${configPath}`);
-    }
+      // Check and create directory if it does not exist
+      if (!existsSync(configPath)) {
+        await io.mkdirP(configPath)
+        core.info(`Directory created: ${configPath}`)
+      } else {
+        core.info(`Directory exists: ${configPath}`)
+      }
 
-    // Check and remove changedPrograms file
-    if (existsSync(changedPrograms)) {
-      if (isPathWithinWorkspace(changedPrograms)) {
-        core.info(`Check file: ${changedPrograms}`);
-        try {
-          unlinkSync(changedPrograms);
-          core.info(`Removed obsolete file: ${changedPrograms}`);
-        } catch (error) {
-          if (error instanceof Error) {
-            core.warning(`Error during file removal: ${error.message}`);
+      // Check and remove changedPrograms file
+      if (existsSync(changedPrograms)) {
+        if (isPathWithinWorkspace(changedPrograms)) {
+          core.info(`Check file: ${changedPrograms}`)
+          try {
+            unlinkSync(changedPrograms)
+            core.info(`Removed obsolete file: ${changedPrograms}`)
+          } catch (error) {
+            if (error instanceof Error) {
+              core.warning(`Error during file removal: ${error.message}`)
+            }
           }
+        } else {
+          core.error(
+            `Potential path manipulation detected in changedPrograms: ${changedPrograms}`
+          )
+          throw new Error('Invalid path for changedPrograms')
         }
       } else {
-        core.error(`Potential path manipulation detected in changedPrograms: ${changedPrograms}`);
-        throw new Error("Invalid path for changedPrograms");
+        core.info(`File does not exist: ${changedPrograms}`)
       }
-    } else {
-      core.info(`File does not exist: ${changedPrograms}`);
-    }
 
-    // Check and remove autoBuildParms file
-    if (existsSync(autoBuildParms)) {
-      if (isPathWithinWorkspace(autoBuildParms)) {
-        core.info(`Check file: ${autoBuildParms}`);
-        try {
-          unlinkSync(autoBuildParms);
-          core.info(`Removed obsolete file: ${autoBuildParms}`);
-        } catch (error) {
-          if (error instanceof Error) {
-            core.warning(`Error during file removal: ${error.message}`);
+      // Check and remove autoBuildParms file
+      if (existsSync(autoBuildParms)) {
+        if (isPathWithinWorkspace(autoBuildParms)) {
+          core.info(`Check file: ${autoBuildParms}`)
+          try {
+            unlinkSync(autoBuildParms)
+            core.info(`Removed obsolete file: ${autoBuildParms}`)
+          } catch (error) {
+            if (error instanceof Error) {
+              core.warning(`Error during file removal: ${error.message}`)
+            }
           }
+        } else {
+          core.error(
+            `Potential path manipulation detected in autoBuildParms: ${autoBuildParms}`
+          )
+          throw new Error('Invalid path for autoBuildParms')
         }
       } else {
-        core.error(`Potential path manipulation detected in autoBuildParms: ${autoBuildParms}`);
-        throw new Error("Invalid path for autoBuildParms");
+        core.info(`File does not exist: ${autoBuildParms}`)
       }
-    } else {
-      core.info(`File does not exist: ${autoBuildParms}`);
-    }
 
-    // Check and remove tempHash file
-    if (existsSync(tempHash)) {
-      if (isPathWithinWorkspace(tempHash)) {
-        core.info(`Check file: ${tempHash}`);
-        try {
-          unlinkSync(tempHash);
-          core.info(`Removed obsolete file: ${tempHash}`);
-        } catch (error) {
-          if (error instanceof Error) {
-            core.warning(`Error during file removal: ${error.message}`);
+      // Check and remove tempHash file
+      if (existsSync(tempHash)) {
+        if (isPathWithinWorkspace(tempHash)) {
+          core.info(`Check file: ${tempHash}`)
+          try {
+            unlinkSync(tempHash)
+            core.info(`Removed obsolete file: ${tempHash}`)
+          } catch (error) {
+            if (error instanceof Error) {
+              core.warning(`Error during file removal: ${error.message}`)
+            }
           }
+        } else {
+          core.error(
+            `Potential path manipulation detected in tempHash: ${tempHash}`
+          )
+          throw new Error('Invalid path for tempHash')
         }
       } else {
-        core.error(`Potential path manipulation detected in tempHash: ${tempHash}`);
-        throw new Error("Invalid path for tempHash");
+        core.info(`File does not exist: ${tempHash}`)
       }
-    } else {
-      core.info(`File does not exist: ${tempHash}`);
-    }
-  
-    let gitPath
-    try {
-      gitPath = await gitCommand.getGitPath()
-    } catch (error) {
-      // do nothing
-    }
 
-    let changedFileList = undefined
+      let gitPath
+      try {
+        gitPath = await gitCommand.getGitPath()
+      } catch (error) {
+        // do nothing
+      }
 
-    if (gitPath) {
-      gitPath = path.resolve(gitPath)
-      changedFileList = await gitCommand.calculateDiff(
-        'git',
-        parms.gitCommit,
-        curWorkspace
-      )
-    } else {
-      changedFileList = await calculateChangedFiles(parms)
-    }
+      let changedFileList = undefined
 
-    if (!changedFileList || changedFileList.length <= 1) {
-      core.info('There is no changed files found.')
-      return
-    } else {
+      if (gitPath) {
+        gitPath = path.resolve(gitPath)
+        changedFileList = await gitCommand.calculateDiff(
+          'git',
+          parms.gitCommit,
+          curWorkspace
+        )
+      } else {
+        changedFileList = await calculateChangedFiles(parms)
+      }
+
+      if (!changedFileList || changedFileList.length <= 1) {
+        core.info('There is no changed files found.')
+        return
+      } else {
+        if (changedFileList.length > 2048) {
+          const writeStream = createWriteStream(tempHash)
+          writeStream.write(changedFileList)
+          writeStream.end()
+        }
+      }
+
+      //-gitCommitFile
+
+      const args = [
+        '-data',
+        configPath,
+        '-host',
+        parms.host,
+        '-port',
+        parms.port.toString(),
+        '-operation',
+        'syncGitToIspw',
+        '-ispwServerConfig',
+        parms.runtimeConfiguration,
+        '-ispwServerStream',
+        parms.stream,
+        '-ispwServerApp',
+        parms.application,
+        '-ispwCheckoutLevel',
+        parms.checkoutLevel,
+        '-gitRepoUrl',
+        parms.gitRepoUrl,
+        '-gitUsername',
+        parms.gitUid,
+        '-gitPassword',
+        parms.gitToken,
+        '-gitBranch',
+        parms.gitBranch,
+        '-gitFromHash',
+        parms.gitFromHash,
+        '-targetFolder',
+        parms.workspace,
+        '-ispwContainerCreation',
+        parms.containerCreation,
+        '-gitLocalPath',
+        parms.gitLocalPath
+      ]
+
+      if (parms.subAppl) {
+        args.push('-ispwServerSubAppl')
+        args.push(parms.subAppl)
+      }
+
+      if (parms.assignmentPrefix) {
+        args.push('-assignmentPrefix')
+        args.push(parms.assignmentPrefix)
+      }
+      if (parms.ispwConfigPath) {
+        args.push('-ispwConfigPath')
+        args.push(parms.ispwConfigPath)
+      }
+
+      if (typeof parms.certificate != 'undefined' && parms.certificate) {
+        args.push('-certificate')
+        args.push(parms.certificate)
+      } else {
+        args.push('-id')
+        args.push(parms.uid)
+        args.push('-pass')
+        args.push(parms.pass)
+      }
+
+      if (parms.timeout) {
+        args.push('-timeout')
+        args.push(parms.timeout.toString())
+      }
+
+      if (parms.codePage) {
+        args.push('-code')
+        args.push(parms.codePage)
+      }
+
+      if (parms.encryptionProtocol) {
+        args.push('-protocol')
+        args.push(parms.encryptionProtocol)
+      }
+
+      if (parms.containerDescription) {
+        args.push('-ispwContainerDescription')
+        args.push(parms.containerDescription)
+      }
+      const gitCommit = core.getInput('gitCommit')
       if (changedFileList.length > 2048) {
-        const writeStream = createWriteStream(tempHash)
-        writeStream.write(changedFileList)
-        writeStream.end()
+        args.push('-gitCommitFile')
+        args.push(tempHash)
+      } else if (gitCommit) {
+        args.push('-gitCommit')
+        args.push(parms.gitCommit)
+      } else {
+        args.push('-gitCommit')
+        changedFileList = quoteArg(false, changedFileList)
+        args.push(changedFileList)
       }
-    }
 
-    //-gitCommitFile
+      if (parms.gitCommitFile) {
+        args.push('-gitCommitFile')
+        args.push(parms.gitCommitFile)
+      }
 
-    const args = [
-      '-data',
-      configPath,
-      '-host',
-      parms.host,
-      '-port',
-      parms.port.toString(),
-      '-operation',
-      'syncGitToIspw',
-      '-ispwServerConfig',
-      parms.runtimeConfiguration,
-      '-ispwServerStream',
-      parms.stream,
-      '-ispwServerApp',
-      parms.application,
-      '-ispwCheckoutLevel',
-      parms.checkoutLevel,
-      '-gitRepoUrl',
-      parms.gitRepoUrl,
-      '-gitUsername',
-      parms.gitUid,
-      '-gitPassword',
-      parms.gitToken,
-      '-gitBranch',
-      parms.gitBranch,
-      '-gitFromHash',
-      parms.gitFromHash,
-      '-targetFolder',
-      parms.workspace,
-      '-ispwContainerCreation',
-      parms.containerCreation,
-      '-gitLocalPath',
-      parms.gitLocalPath
-    ]
+      cwd = quoteArg(true, cwd)
+      cliPath = quoteArg(true, cliPath)
+      core.debug(`Code Pipeline CLI parms: ${parms}`)
 
-    if (parms.subAppl) {
-      args.push('-ispwServerSubAppl')
-      args.push(parms.subAppl)
-    }
-
-    if (parms.assignmentPrefix) {
-      args.push('-assignmentPrefix')
-      args.push(parms.assignmentPrefix)
-    }
-    if (parms.ispwConfigPath) {
-      args.push('-ispwConfigPath')
-      args.push(parms.ispwConfigPath)
-    }
-
-    if (typeof parms.certificate != 'undefined' && parms.certificate) {
-      args.push('-certificate')
-      args.push(parms.certificate)
+      await exec(cliPath, args, {cwd})
     } else {
-      args.push('-id')
-      args.push(parms.uid)
-      args.push('-pass')
-      args.push(parms.pass)
+      throw new Error(
+        `Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`
+      )
     }
-
-    if (parms.timeout) {
-      args.push('-timeout')
-      args.push(parms.timeout.toString())
-    }
-
-    if (parms.codePage) {
-      args.push('-code')
-      args.push(parms.codePage)
-    }
-
-    if (parms.encryptionProtocol) {
-      args.push('-protocol')
-      args.push(parms.encryptionProtocol)
-    }
-
-    if (parms.containerDescription) {
-      args.push('-ispwContainerDescription')
-      args.push(parms.containerDescription)
-    }
-	  const gitCommit = core.getInput('gitCommit');
-    if (changedFileList.length > 2048) {
-      args.push('-gitCommitFile')
-      args.push(tempHash)
-    } 
-    else if (gitCommit) {
-      args.push('-gitCommit')
-      args.push(parms.gitCommit)
-    }else {
-      args.push('-gitCommit')
-      changedFileList = quoteArg(false, changedFileList)
-      args.push(changedFileList)
-    }
-
-    if (parms.gitCommitFile) {
-      args.push('-gitCommitFile')
-      args.push(parms.gitCommitFile)
-    }
-
-    cwd = quoteArg(true, cwd)
-    cliPath = quoteArg(true, cliPath)
-    core.debug(`Code Pipeline CLI parms: ${parms}`)
-
-    await exec(cliPath, args, {cwd})
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(`Error: ${error.message}`)
