@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -51,7 +47,7 @@ function getISPWCLIPath(parms) {
                 topazCLIPath = path.join(topazCLIPath, 'IspwCLI.bat');
                 topazCLIPath = path.normalize(topazCLIPath);
                 core.debug(`Workbench CLI Path: '${topazCLIPath}'`);
-                if ((0, fs_1.existsSync)(topazCLIPath)) {
+                if (fs_1.existsSync(topazCLIPath)) {
                     return topazCLIPath;
                 }
                 else {
@@ -64,7 +60,7 @@ function getISPWCLIPath(parms) {
                 topazCLIPath = path.join(topazCLIPath, 'IspwCLI.sh');
                 topazCLIPath = path.normalize(topazCLIPath);
                 core.debug(`Workbench CLI Path: ${topazCLIPath}`);
-                if ((0, fs_1.existsSync)(topazCLIPath)) {
+                if (fs_1.existsSync(topazCLIPath)) {
                     return topazCLIPath;
                 }
                 else {
@@ -86,7 +82,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 core.debug('Fail to get input values or environment settings');
                 throw new Error(`Fail to get input values or environment settings`);
             }
-            if ((0, input_helper_1.checkForHarmfulCharAndWords)(parms.workspace)) {
+            if (input_helper_1.checkForHarmfulCharAndWords(parms.workspace)) {
                 // Resolve the workspace to an absolute and canonical path to prevent directory traversal
                 const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
                 core.info(`curWorkspace inside if value is:${curWorkspace}`);
@@ -102,7 +98,7 @@ function execISPWSync(cliPath, parms, cwd) {
                     return realPath.startsWith(curWorkspace);
                 };
                 // Check and create directory if it does not exist
-                if (!(0, fs_1.existsSync)(configPath)) {
+                if (!fs_1.existsSync(configPath)) {
                     yield io.mkdirP(configPath);
                     core.info(`Directory created: ${configPath}`);
                 }
@@ -110,11 +106,11 @@ function execISPWSync(cliPath, parms, cwd) {
                     core.info(`Directory exists: ${configPath}`);
                 }
                 // Check and remove changedPrograms file
-                if ((0, fs_1.existsSync)(changedPrograms)) {
+                if (fs_1.existsSync(changedPrograms)) {
                     if (isPathWithinWorkspace(changedPrograms)) {
                         core.info(`Check file: ${changedPrograms}`);
                         try {
-                            (0, fs_1.unlinkSync)(changedPrograms);
+                            fs_1.unlinkSync(changedPrograms);
                             core.info(`Removed obsolete file: ${changedPrograms}`);
                         }
                         catch (error) {
@@ -132,11 +128,11 @@ function execISPWSync(cliPath, parms, cwd) {
                     core.info(`File does not exist: ${changedPrograms}`);
                 }
                 // Check and remove autoBuildParms file
-                if ((0, fs_1.existsSync)(autoBuildParms)) {
+                if (fs_1.existsSync(autoBuildParms)) {
                     if (isPathWithinWorkspace(autoBuildParms)) {
                         core.info(`Check file: ${autoBuildParms}`);
                         try {
-                            (0, fs_1.unlinkSync)(autoBuildParms);
+                            fs_1.unlinkSync(autoBuildParms);
                             core.info(`Removed obsolete file: ${autoBuildParms}`);
                         }
                         catch (error) {
@@ -154,11 +150,11 @@ function execISPWSync(cliPath, parms, cwd) {
                     core.info(`File does not exist: ${autoBuildParms}`);
                 }
                 // Check and remove tempHash file
-                if ((0, fs_1.existsSync)(tempHash)) {
+                if (fs_1.existsSync(tempHash)) {
                     if (isPathWithinWorkspace(tempHash)) {
                         core.info(`Check file: ${tempHash}`);
                         try {
-                            (0, fs_1.unlinkSync)(tempHash);
+                            fs_1.unlinkSync(tempHash);
                             core.info(`Removed obsolete file: ${tempHash}`);
                         }
                         catch (error) {
@@ -188,7 +184,7 @@ function execISPWSync(cliPath, parms, cwd) {
                     changedFileList = yield gitCommand.calculateDiff('git', parms.gitCommit, curWorkspace);
                 }
                 else {
-                    changedFileList = yield (0, github_restapi_helper_1.calculateChangedFiles)(parms);
+                    changedFileList = yield github_restapi_helper_1.calculateChangedFiles(parms);
                 }
                 if (!changedFileList || changedFileList.length <= 1) {
                     core.info('There is no changed files found.');
@@ -196,7 +192,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
                 else {
                     if (changedFileList.length > 2048) {
-                        const writeStream = (0, fs_1.createWriteStream)(tempHash);
+                        const writeStream = fs_1.createWriteStream(tempHash);
                         writeStream.write(changedFileList);
                         writeStream.end();
                     }
@@ -295,7 +291,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 cwd = quoteArg(true, cwd);
                 cliPath = quoteArg(true, cliPath);
                 core.debug(`Code Pipeline CLI parms: ${parms}`);
-                yield (0, exec_1.exec)(cliPath, args, { cwd });
+                yield exec_1.exec(cliPath, args, { cwd });
             }
             else {
                 throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);

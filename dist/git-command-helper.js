@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -37,8 +33,8 @@ const core = __importStar(require("@actions/core"));
 const exec = __importStar(require("@actions/exec"));
 const io = __importStar(require("@actions/io"));
 const github = __importStar(require("@actions/github"));
-function execGit(gitPath_1, args_1) {
-    return __awaiter(this, arguments, void 0, function* (gitPath, args, allowAllExitCodes = false, wkspace, silent = false) {
+function execGit(gitPath, args, allowAllExitCodes = false, wkspace, silent = false) {
+    return __awaiter(this, void 0, void 0, function* () {
         const result = new GitCommandOutput();
         const env = {};
         const stdout = [];
