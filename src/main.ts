@@ -10,6 +10,7 @@ async function run(): Promise<void> {
     const curWk = process.env.GITHUB_WORKSPACE
     // eslint-disable-next-line no-console
     console.log(curWk)
+    core.info(`curWK value is:${curWk}`)
     const parms = getInputs()
 
     let clipath = ''
@@ -35,6 +36,7 @@ async function run(): Promise<void> {
     const workpace: string = curWk ?? ''
     // eslint-disable-next-line no-console
     console.log(curWk)
+    core.info(`curWK value is:${curWk}`)
 
     //Execution is completed
     try {
