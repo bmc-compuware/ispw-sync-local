@@ -8,7 +8,8 @@ import * as fs from 'fs'
 async function run(): Promise<void> {
   try {
     const curWk = process.env.GITHUB_WORKSPACE
-
+    // eslint-disable-next-line no-console
+    console.log(curWk)
     const parms = getInputs()
 
     let clipath = ''
@@ -32,6 +33,8 @@ async function run(): Promise<void> {
 
     core.info('Setting up the output values')
     const workpace: string = curWk ?? ''
+    // eslint-disable-next-line no-console
+    console.log(curWk)
 
     //Execution is completed
     try {
