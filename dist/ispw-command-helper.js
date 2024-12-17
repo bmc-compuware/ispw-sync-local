@@ -81,7 +81,7 @@ function execISPWSync(cliPath, parms, cwd) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             core.info('Start ISPW Sync action');
-            core.info(`curWK outside if value is:${cwd}`);
+            core.info(`curWK outside if value is1:${cwd}`);
             if (!parms || !cwd) {
                 core.debug('Fail to get input values or environment settings');
                 throw new Error(`Fail to get input values or environment settings`);

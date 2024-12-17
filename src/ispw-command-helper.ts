@@ -55,7 +55,7 @@ export async function execISPWSync(
 ): Promise<void> {
   try {
     core.info('Start ISPW Sync action')
-    core.info(`curWK outside if value is:${cwd}`)
+    core.info(`curWK outside if value is1:${cwd}`)
 
     if (!parms || !cwd) {
       core.debug('Fail to get input values or environment settings')
