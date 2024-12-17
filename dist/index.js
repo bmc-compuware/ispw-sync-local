@@ -328,7 +328,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validatePath = exports.getInputs = void 0;
+exports.checkForHarmfulCharAndWords = exports.validatePath = exports.getInputs = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const path = __importStar(__nccwpck_require__(1017));
@@ -535,6 +535,38 @@ function validatePath(aPath) {
     });
 }
 exports.validatePath = validatePath;
+/**
+ * Function that checks if the input string contains the word 'safe'.
+ * @param input The string to check
+ * @returns { boolean } Returns true if 'safe' is found in the input string, otherwise false.
+ */
+function checkForHarmfulCharAndWords(input) {
+    // eslint-disable-next-line no-useless-escape
+    const harmfulCharsRegex = /^[a-zA-Z0-9_\-\.\/\\]+$/g;
+    const harmfulWords = [
+        'config',
+        'bin',
+        'secret',
+        'password',
+        'admin',
+        'backup',
+        'restricted',
+        'bin'
+    ];
+    // Check for harmful characters using the regex
+    if (harmfulCharsRegex.test(input)) {
+        return false; // Harmful character found
+    }
+    // Check for harmful words in the input string
+    const inputLowerCase = input.toLowerCase(); // Convert the input to lowercase for case-insensitive comparison
+    for (const word of harmfulWords) {
+        if (inputLowerCase.includes(word.toLowerCase())) {
+            return false; // Harmful word found
+        }
+    }
+    return true; // No harmful characters or words found
+}
+exports.checkForHarmfulCharAndWords = checkForHarmfulCharAndWords;
 //# sourceMappingURL=input-helper.js.map
 
 /***/ }),
@@ -582,6 +614,7 @@ const fs_1 = __nccwpck_require__(7147);
 const gitCommand = __importStar(__nccwpck_require__(4501));
 const github_restapi_helper_1 = __nccwpck_require__(6463);
 const fs = __importStar(__nccwpck_require__(7147));
+const input_helper_1 = __nccwpck_require__(300);
 function getISPWCLIPath(parms) {
     return __awaiter(this, void 0, void 0, function* () {
         let topazCLIPath = '';
@@ -625,213 +658,219 @@ function execISPWSync(cliPath, parms, cwd) {
                 core.debug('Fail to get input values or environment settings');
                 throw new Error(`Fail to get input values or environment settings`);
             }
-            // Resolve the workspace to an absolute and canonical path to prevent directory traversal
-            const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
-            // Define paths
-            const configPath = path.join(curWorkspace, 'ispwcliwk');
-            const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
-            const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
-            const tempHash = path.join(curWorkspace, 'toHash.txt');
-            // Function to check if a file's real path is within the allowed directory
-            const isPathWithinWorkspace = (filePath) => {
-                const realPath = fs.realpathSync(filePath);
-                return realPath.startsWith(curWorkspace);
-            };
-            // Check and create directory if it does not exist
-            if (!fs_1.existsSync(configPath)) {
-                yield io.mkdirP(configPath);
-                core.info(`Directory created: ${configPath}`);
-            }
-            else {
-                core.info(`Directory exists: ${configPath}`);
-            }
-            // Check and remove changedPrograms file
-            if (fs_1.existsSync(changedPrograms)) {
-                if (isPathWithinWorkspace(changedPrograms)) {
-                    core.info(`Check file: ${changedPrograms}`);
-                    try {
-                        fs_1.unlinkSync(changedPrograms);
-                        core.info(`Removed obsolete file: ${changedPrograms}`);
-                    }
-                    catch (error) {
-                        if (error instanceof Error) {
-                            core.warning(`Error during file removal: ${error.message}`);
+            if (input_helper_1.checkForHarmfulCharAndWords(parms.workspace)) {
+                // Resolve the workspace to an absolute and canonical path to prevent directory traversal
+                const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
+                // Define paths
+                const configPath = path.join(curWorkspace, 'ispwcliwk');
+                const changedPrograms = path.join(curWorkspace, 'changedPrograms.json');
+                const autoBuildParms = path.join(curWorkspace, 'automaticBuildParams.txt');
+                const tempHash = path.join(curWorkspace, 'toHash.txt');
+                // Function to check if a file's real path is within the allowed directory
+                // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+                const isPathWithinWorkspace = (filePath) => {
+                    const realPath = fs.realpathSync(filePath);
+                    return realPath.startsWith(curWorkspace);
+                };
+                // Check and create directory if it does not exist
+                if (!fs_1.existsSync(configPath)) {
+                    yield io.mkdirP(configPath);
+                    core.info(`Directory created: ${configPath}`);
+                }
+                else {
+                    core.info(`Directory exists: ${configPath}`);
+                }
+                // Check and remove changedPrograms file
+                if (fs_1.existsSync(changedPrograms)) {
+                    if (isPathWithinWorkspace(changedPrograms)) {
+                        core.info(`Check file: ${changedPrograms}`);
+                        try {
+                            fs_1.unlinkSync(changedPrograms);
+                            core.info(`Removed obsolete file: ${changedPrograms}`);
                         }
+                        catch (error) {
+                            if (error instanceof Error) {
+                                core.warning(`Error during file removal: ${error.message}`);
+                            }
+                        }
+                    }
+                    else {
+                        core.error(`Potential path manipulation detected in changedPrograms: ${changedPrograms}`);
+                        throw new Error('Invalid path for changedPrograms');
                     }
                 }
                 else {
-                    core.error(`Potential path manipulation detected in changedPrograms: ${changedPrograms}`);
-                    throw new Error("Invalid path for changedPrograms");
+                    core.info(`File does not exist: ${changedPrograms}`);
                 }
-            }
-            else {
-                core.info(`File does not exist: ${changedPrograms}`);
-            }
-            // Check and remove autoBuildParms file
-            if (fs_1.existsSync(autoBuildParms)) {
-                if (isPathWithinWorkspace(autoBuildParms)) {
-                    core.info(`Check file: ${autoBuildParms}`);
-                    try {
-                        fs_1.unlinkSync(autoBuildParms);
-                        core.info(`Removed obsolete file: ${autoBuildParms}`);
-                    }
-                    catch (error) {
-                        if (error instanceof Error) {
-                            core.warning(`Error during file removal: ${error.message}`);
+                // Check and remove autoBuildParms file
+                if (fs_1.existsSync(autoBuildParms)) {
+                    if (isPathWithinWorkspace(autoBuildParms)) {
+                        core.info(`Check file: ${autoBuildParms}`);
+                        try {
+                            fs_1.unlinkSync(autoBuildParms);
+                            core.info(`Removed obsolete file: ${autoBuildParms}`);
                         }
+                        catch (error) {
+                            if (error instanceof Error) {
+                                core.warning(`Error during file removal: ${error.message}`);
+                            }
+                        }
+                    }
+                    else {
+                        core.error(`Potential path manipulation detected in autoBuildParms: ${autoBuildParms}`);
+                        throw new Error('Invalid path for autoBuildParms');
                     }
                 }
                 else {
-                    core.error(`Potential path manipulation detected in autoBuildParms: ${autoBuildParms}`);
-                    throw new Error("Invalid path for autoBuildParms");
+                    core.info(`File does not exist: ${autoBuildParms}`);
                 }
-            }
-            else {
-                core.info(`File does not exist: ${autoBuildParms}`);
-            }
-            // Check and remove tempHash file
-            if (fs_1.existsSync(tempHash)) {
-                if (isPathWithinWorkspace(tempHash)) {
-                    core.info(`Check file: ${tempHash}`);
-                    try {
-                        fs_1.unlinkSync(tempHash);
-                        core.info(`Removed obsolete file: ${tempHash}`);
-                    }
-                    catch (error) {
-                        if (error instanceof Error) {
-                            core.warning(`Error during file removal: ${error.message}`);
+                // Check and remove tempHash file
+                if (fs_1.existsSync(tempHash)) {
+                    if (isPathWithinWorkspace(tempHash)) {
+                        core.info(`Check file: ${tempHash}`);
+                        try {
+                            fs_1.unlinkSync(tempHash);
+                            core.info(`Removed obsolete file: ${tempHash}`);
                         }
+                        catch (error) {
+                            if (error instanceof Error) {
+                                core.warning(`Error during file removal: ${error.message}`);
+                            }
+                        }
+                    }
+                    else {
+                        core.error(`Potential path manipulation detected in tempHash: ${tempHash}`);
+                        throw new Error('Invalid path for tempHash');
                     }
                 }
                 else {
-                    core.error(`Potential path manipulation detected in tempHash: ${tempHash}`);
-                    throw new Error("Invalid path for tempHash");
+                    core.info(`File does not exist: ${tempHash}`);
                 }
-            }
-            else {
-                core.info(`File does not exist: ${tempHash}`);
-            }
-            let gitPath;
-            try {
-                gitPath = yield gitCommand.getGitPath();
-            }
-            catch (error) {
-                // do nothing
-            }
-            let changedFileList = undefined;
-            if (gitPath) {
-                gitPath = path.resolve(gitPath);
-                changedFileList = yield gitCommand.calculateDiff('git', parms.gitCommit, curWorkspace);
-            }
-            else {
-                changedFileList = yield github_restapi_helper_1.calculateChangedFiles(parms);
-            }
-            if (!changedFileList || changedFileList.length <= 1) {
-                core.info('There is no changed files found.');
-                return;
-            }
-            else {
+                let gitPath;
+                try {
+                    gitPath = yield gitCommand.getGitPath();
+                }
+                catch (error) {
+                    // do nothing
+                }
+                let changedFileList = undefined;
+                if (gitPath) {
+                    gitPath = path.resolve(gitPath);
+                    changedFileList = yield gitCommand.calculateDiff('git', parms.gitCommit, curWorkspace);
+                }
+                else {
+                    changedFileList = yield github_restapi_helper_1.calculateChangedFiles(parms);
+                }
+                if (!changedFileList || changedFileList.length <= 1) {
+                    core.info('There is no changed files found.');
+                    return;
+                }
+                else {
+                    if (changedFileList.length > 2048) {
+                        const writeStream = fs_1.createWriteStream(tempHash);
+                        writeStream.write(changedFileList);
+                        writeStream.end();
+                    }
+                }
+                //-gitCommitFile
+                const args = [
+                    '-data',
+                    configPath,
+                    '-host',
+                    parms.host,
+                    '-port',
+                    parms.port.toString(),
+                    '-operation',
+                    'syncGitToIspw',
+                    '-ispwServerConfig',
+                    parms.runtimeConfiguration,
+                    '-ispwServerStream',
+                    parms.stream,
+                    '-ispwServerApp',
+                    parms.application,
+                    '-ispwCheckoutLevel',
+                    parms.checkoutLevel,
+                    '-gitRepoUrl',
+                    parms.gitRepoUrl,
+                    '-gitUsername',
+                    parms.gitUid,
+                    '-gitPassword',
+                    parms.gitToken,
+                    '-gitBranch',
+                    parms.gitBranch,
+                    '-gitFromHash',
+                    parms.gitFromHash,
+                    '-targetFolder',
+                    parms.workspace,
+                    '-ispwContainerCreation',
+                    parms.containerCreation,
+                    '-gitLocalPath',
+                    parms.gitLocalPath
+                ];
+                if (parms.subAppl) {
+                    args.push('-ispwServerSubAppl');
+                    args.push(parms.subAppl);
+                }
+                if (parms.assignmentPrefix) {
+                    args.push('-assignmentPrefix');
+                    args.push(parms.assignmentPrefix);
+                }
+                if (parms.ispwConfigPath) {
+                    args.push('-ispwConfigPath');
+                    args.push(parms.ispwConfigPath);
+                }
+                if (typeof parms.certificate != 'undefined' && parms.certificate) {
+                    args.push('-certificate');
+                    args.push(parms.certificate);
+                }
+                else {
+                    args.push('-id');
+                    args.push(parms.uid);
+                    args.push('-pass');
+                    args.push(parms.pass);
+                }
+                if (parms.timeout) {
+                    args.push('-timeout');
+                    args.push(parms.timeout.toString());
+                }
+                if (parms.codePage) {
+                    args.push('-code');
+                    args.push(parms.codePage);
+                }
+                if (parms.encryptionProtocol) {
+                    args.push('-protocol');
+                    args.push(parms.encryptionProtocol);
+                }
+                if (parms.containerDescription) {
+                    args.push('-ispwContainerDescription');
+                    args.push(parms.containerDescription);
+                }
+                const gitCommit = core.getInput('gitCommit');
                 if (changedFileList.length > 2048) {
-                    const writeStream = fs_1.createWriteStream(tempHash);
-                    writeStream.write(changedFileList);
-                    writeStream.end();
+                    args.push('-gitCommitFile');
+                    args.push(tempHash);
                 }
-            }
-            //-gitCommitFile
-            const args = [
-                '-data',
-                configPath,
-                '-host',
-                parms.host,
-                '-port',
-                parms.port.toString(),
-                '-operation',
-                'syncGitToIspw',
-                '-ispwServerConfig',
-                parms.runtimeConfiguration,
-                '-ispwServerStream',
-                parms.stream,
-                '-ispwServerApp',
-                parms.application,
-                '-ispwCheckoutLevel',
-                parms.checkoutLevel,
-                '-gitRepoUrl',
-                parms.gitRepoUrl,
-                '-gitUsername',
-                parms.gitUid,
-                '-gitPassword',
-                parms.gitToken,
-                '-gitBranch',
-                parms.gitBranch,
-                '-gitFromHash',
-                parms.gitFromHash,
-                '-targetFolder',
-                parms.workspace,
-                '-ispwContainerCreation',
-                parms.containerCreation,
-                '-gitLocalPath',
-                parms.gitLocalPath
-            ];
-            if (parms.subAppl) {
-                args.push('-ispwServerSubAppl');
-                args.push(parms.subAppl);
-            }
-            if (parms.assignmentPrefix) {
-                args.push('-assignmentPrefix');
-                args.push(parms.assignmentPrefix);
-            }
-            if (parms.ispwConfigPath) {
-                args.push('-ispwConfigPath');
-                args.push(parms.ispwConfigPath);
-            }
-            if (typeof parms.certificate != 'undefined' && parms.certificate) {
-                args.push('-certificate');
-                args.push(parms.certificate);
+                else if (gitCommit) {
+                    args.push('-gitCommit');
+                    args.push(parms.gitCommit);
+                }
+                else {
+                    args.push('-gitCommit');
+                    changedFileList = quoteArg(false, changedFileList);
+                    args.push(changedFileList);
+                }
+                if (parms.gitCommitFile) {
+                    args.push('-gitCommitFile');
+                    args.push(parms.gitCommitFile);
+                }
+                cwd = quoteArg(true, cwd);
+                cliPath = quoteArg(true, cliPath);
+                core.debug(`Code Pipeline CLI parms: ${parms}`);
+                yield exec_1.exec(cliPath, args, { cwd });
             }
             else {
-                args.push('-id');
-                args.push(parms.uid);
-                args.push('-pass');
-                args.push(parms.pass);
+                throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);
             }
-            if (parms.timeout) {
-                args.push('-timeout');
-                args.push(parms.timeout.toString());
-            }
-            if (parms.codePage) {
-                args.push('-code');
-                args.push(parms.codePage);
-            }
-            if (parms.encryptionProtocol) {
-                args.push('-protocol');
-                args.push(parms.encryptionProtocol);
-            }
-            if (parms.containerDescription) {
-                args.push('-ispwContainerDescription');
-                args.push(parms.containerDescription);
-            }
-            const gitCommit = core.getInput('gitCommit');
-            if (changedFileList.length > 2048) {
-                args.push('-gitCommitFile');
-                args.push(tempHash);
-            }
-            else if (gitCommit) {
-                args.push('-gitCommit');
-                args.push(parms.gitCommit);
-            }
-            else {
-                args.push('-gitCommit');
-                changedFileList = quoteArg(false, changedFileList);
-                args.push(changedFileList);
-            }
-            if (parms.gitCommitFile) {
-                args.push('-gitCommitFile');
-                args.push(parms.gitCommitFile);
-            }
-            cwd = quoteArg(true, cwd);
-            cliPath = quoteArg(true, cliPath);
-            core.debug(`Code Pipeline CLI parms: ${parms}`);
-            yield exec_1.exec(cliPath, args, { cwd });
         }
         catch (error) {
             if (error instanceof Error) {
@@ -934,25 +973,33 @@ function run() {
             const workpace = curWk !== null && curWk !== void 0 ? curWk : '';
             //Execution is completed
             try {
-                // Normalize and resolve the workspace path to ensure it's absolute and sanitized
-                const resolvedWorkspace = path.resolve(path.normalize(workpace));
-                // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
-                const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
-                const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
-                // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
-                if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-                    throw new Error('Potential path traversal detected!');
-                }
-                const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-                const realAutoBuildParms = fs.realpathSync(autoBuildParms);
-                // Ensure that autoBuildParms is within the resolvedWorkspace
-                const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
-                if (!relativeAutoBuild.startsWith('..') && !path.isAbsolute(relativeAutoBuild) && fs_1.existsSync(realAutoBuildParms)) {
-                    const dataStr = fs_1.readFileSync(realAutoBuildParms, 'utf8');
-                    core.setOutput('automaticBuildJson', dataStr);
+                //if (allowedCharsRegex.test(workpace)) {
+                if (input_helper_1.checkForHarmfulCharAndWords(workpace)) {
+                    // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+                    const resolvedWorkspace = path.resolve(path.normalize(workpace));
+                    // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+                    const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
+                    const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
+                    // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+                    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+                        throw new Error('Potential path traversal detected!');
+                    }
+                    const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
+                    const realAutoBuildParms = fs.realpathSync(autoBuildParms);
+                    // Ensure that autoBuildParms is within the resolvedWorkspace
+                    const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
+                    if (!relativeAutoBuild.startsWith('..') &&
+                        !path.isAbsolute(relativeAutoBuild) &&
+                        fs_1.existsSync(realAutoBuildParms)) {
+                        const dataStr = fs_1.readFileSync(realAutoBuildParms, 'utf8');
+                        core.setOutput('automaticBuildJson', dataStr);
+                    }
+                    else {
+                        core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
+                    }
                 }
                 else {
-                    core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
+                    throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);
                 }
             }
             catch (error) {

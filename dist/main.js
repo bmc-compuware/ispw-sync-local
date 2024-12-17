@@ -62,25 +62,33 @@ function run() {
             const workpace = curWk !== null && curWk !== void 0 ? curWk : '';
             //Execution is completed
             try {
-                // Normalize and resolve the workspace path to ensure it's absolute and sanitized
-                const resolvedWorkspace = path.resolve(path.normalize(workpace));
-                // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
-                const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
-                const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
-                // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
-                if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-                    throw new Error('Potential path traversal detected!');
-                }
-                const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-                const realAutoBuildParms = fs.realpathSync(autoBuildParms);
-                // Ensure that autoBuildParms is within the resolvedWorkspace
-                const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
-                if (!relativeAutoBuild.startsWith('..') && !path.isAbsolute(relativeAutoBuild) && fs_1.existsSync(realAutoBuildParms)) {
-                    const dataStr = fs_1.readFileSync(realAutoBuildParms, 'utf8');
-                    core.setOutput('automaticBuildJson', dataStr);
+                //if (allowedCharsRegex.test(workpace)) {
+                if (input_helper_1.checkForHarmfulCharAndWords(workpace)) {
+                    // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+                    const resolvedWorkspace = path.resolve(path.normalize(workpace));
+                    // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+                    const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
+                    const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
+                    // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+                    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+                        throw new Error('Potential path traversal detected!');
+                    }
+                    const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
+                    const realAutoBuildParms = fs.realpathSync(autoBuildParms);
+                    // Ensure that autoBuildParms is within the resolvedWorkspace
+                    const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
+                    if (!relativeAutoBuild.startsWith('..') &&
+                        !path.isAbsolute(relativeAutoBuild) &&
+                        fs_1.existsSync(realAutoBuildParms)) {
+                        const dataStr = fs_1.readFileSync(realAutoBuildParms, 'utf8');
+                        core.setOutput('automaticBuildJson', dataStr);
+                    }
+                    else {
+                        core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
+                    }
                 }
                 else {
-                    core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
+                    throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);
                 }
             }
             catch (error) {
