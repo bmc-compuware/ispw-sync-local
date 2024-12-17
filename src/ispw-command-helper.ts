@@ -55,6 +55,7 @@ export async function execISPWSync(
 ): Promise<void> {
   try {
     core.info('Start ISPW Sync action')
+    core.info(`curWK outside if value is:${cwd}`)
 
     if (!parms || !cwd) {
       core.debug('Fail to get input values or environment settings')
@@ -64,7 +65,7 @@ export async function execISPWSync(
     if (checkForHarmfulCharAndWords(parms.workspace)) {
       // Resolve the workspace to an absolute and canonical path to prevent directory traversal
       const curWorkspace = fs.realpathSync(path.resolve(parms.workspace))
-
+      core.info(`curWorkspace inside if value is:${curWorkspace}`)
       // Define paths
       const configPath = path.join(curWorkspace, 'ispwcliwk')
       const changedPrograms = path.join(curWorkspace, 'changedPrograms.json')
