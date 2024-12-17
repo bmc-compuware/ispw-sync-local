@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -28,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validatePath = exports.getInputs = void 0;
+exports.checkForHarmfulCharAndWords = exports.validatePath = exports.getInputs = void 0;
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const path = __importStar(require("path"));
@@ -235,4 +239,36 @@ function validatePath(aPath) {
     });
 }
 exports.validatePath = validatePath;
+/**
+ * Function that checks if the input string contains the word 'safe'.
+ * @param input The string to check
+ * @returns { boolean } Returns true if 'safe' is found in the input string, otherwise false.
+ */
+function checkForHarmfulCharAndWords(input) {
+    // eslint-disable-next-line no-useless-escape
+    const harmfulCharsRegex = /^[a-zA-Z0-9_\-\.\/\\]+$/g;
+    const harmfulWords = [
+        'config',
+        'bin',
+        'secret',
+        'password',
+        'admin',
+        'backup',
+        'restricted',
+        'bin'
+    ];
+    // Check for harmful characters using the regex
+    if (harmfulCharsRegex.test(input)) {
+        return false; // Harmful character found
+    }
+    // Check for harmful words in the input string
+    const inputLowerCase = input.toLowerCase(); // Convert the input to lowercase for case-insensitive comparison
+    for (const word of harmfulWords) {
+        if (inputLowerCase.includes(word.toLowerCase())) {
+            return false; // Harmful word found
+        }
+    }
+    return true; // No harmful characters or words found
+}
+exports.checkForHarmfulCharAndWords = checkForHarmfulCharAndWords;
 //# sourceMappingURL=input-helper.js.map

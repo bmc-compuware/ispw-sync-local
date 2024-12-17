@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -38,10 +42,13 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const curWk = process.env.GITHUB_WORKSPACE;
-            const parms = input_helper_1.getInputs();
+            // eslint-disable-next-line no-console
+            console.log(curWk);
+            core.info(`curWK value is:${curWk}`);
+            const parms = (0, input_helper_1.getInputs)();
             let clipath = '';
             try {
-                clipath = yield ispw_command_helper_1.getISPWCLIPath(parms);
+                clipath = yield (0, ispw_command_helper_1.getISPWCLIPath)(parms);
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -50,7 +57,7 @@ function run() {
                 }
             }
             try {
-                yield ispw_command_helper_1.execISPWSync(clipath, parms, curWk);
+                yield (0, ispw_command_helper_1.execISPWSync)(clipath, parms, curWk);
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -60,27 +67,38 @@ function run() {
             }
             core.info('Setting up the output values');
             const workpace = curWk !== null && curWk !== void 0 ? curWk : '';
+            // eslint-disable-next-line no-console
+            console.log(curWk);
+            core.info(`curWK value is:${curWk}`);
             //Execution is completed
             try {
-                // Normalize and resolve the workspace path to ensure it's absolute and sanitized
-                const resolvedWorkspace = path.resolve(path.normalize(workpace));
-                // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
-                const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
-                const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
-                // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
-                if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-                    throw new Error('Potential path traversal detected!');
-                }
-                const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
-                const realAutoBuildParms = fs.realpathSync(autoBuildParms);
-                // Ensure that autoBuildParms is within the resolvedWorkspace
-                const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
-                if (!relativeAutoBuild.startsWith('..') && !path.isAbsolute(relativeAutoBuild) && fs_1.existsSync(realAutoBuildParms)) {
-                    const dataStr = fs_1.readFileSync(realAutoBuildParms, 'utf8');
-                    core.setOutput('automaticBuildJson', dataStr);
+                //if (allowedCharsRegex.test(workpace)) {
+                if ((0, input_helper_1.checkForHarmfulCharAndWords)(workpace)) {
+                    // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+                    const resolvedWorkspace = path.resolve(path.normalize(workpace));
+                    // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+                    const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
+                    const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
+                    // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+                    if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+                        throw new Error('Potential path traversal detected!');
+                    }
+                    const autoBuildParms = path.join(resolvedWorkspace, 'automaticBuildParams.txt');
+                    const realAutoBuildParms = fs.realpathSync(autoBuildParms);
+                    // Ensure that autoBuildParms is within the resolvedWorkspace
+                    const relativeAutoBuild = path.relative(resolvedWorkspace, realAutoBuildParms);
+                    if (!relativeAutoBuild.startsWith('..') &&
+                        !path.isAbsolute(relativeAutoBuild) &&
+                        (0, fs_1.existsSync)(realAutoBuildParms)) {
+                        const dataStr = (0, fs_1.readFileSync)(realAutoBuildParms, 'utf8');
+                        core.setOutput('automaticBuildJson', dataStr);
+                    }
+                    else {
+                        core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
+                    }
                 }
                 else {
-                    core.warning(`Path for autoBuildParms is not valid or does not exist: ${autoBuildParms}`);
+                    throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);
                 }
             }
             catch (error) {
@@ -91,8 +109,8 @@ function run() {
             }
             try {
                 const changedProgs = path.join(workpace, 'changedPrograms.json');
-                if (fs_1.existsSync(changedProgs)) {
-                    const dataStr = fs_1.readFileSync(changedProgs).toString('utf8');
+                if ((0, fs_1.existsSync)(changedProgs)) {
+                    const dataStr = (0, fs_1.readFileSync)(changedProgs).toString('utf8');
                     core.setOutput('changedProgramsJson', dataStr);
                 }
             }
