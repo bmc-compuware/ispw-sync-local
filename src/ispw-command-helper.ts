@@ -62,6 +62,20 @@ export async function execISPWSync(
     }
 
     if (checkForHarmfulCharAndWords(parms.workspace)) {
+      // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+      const resolvedWorkspace = path.resolve(path.normalize(parms.workspace))
+
+      // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+      const baseWorkspace = path.resolve(
+        path.normalize(process.env.GITHUB_WORKSPACE || '')
+      )
+      const relativePath = path.relative(baseWorkspace, resolvedWorkspace)
+
+      // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+      if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+        throw new Error('Potential path traversal detected!')
+      }
+
       // Resolve the workspace to an absolute and canonical path to prevent directory traversal
       const curWorkspace = fs.realpathSync(path.resolve(parms.workspace))
 

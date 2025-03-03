@@ -1,9 +1,16 @@
 import * as core from '@actions/core'
 import {execISPWSync, getISPWCLIPath} from './ispw-command-helper'
-import {getInputs, checkForHarmfulCharAndWords} from './input-helper'
+import {
+  getInputs,
+  checkForHarmfulCharAndWords,
+  validateInputs
+} from './input-helper'
 import {existsSync, readFileSync} from 'fs'
 import * as path from 'path'
 import * as fs from 'fs'
+//  @typescript-eslint/no-unused-vars
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import {error} from 'console'
 
 async function run(): Promise<void> {
   try {
@@ -11,9 +18,20 @@ async function run(): Promise<void> {
 
     const parms = getInputs()
 
+    try {
+      validateInputs(parms)
+      // eslint-disable-next-line no-shadow
+    } catch (error) {
+      if (error instanceof Error) {
+        core.debug(`${error.message}`)
+        throw error
+      }
+    }
+
     let clipath = ''
     try {
       clipath = await getISPWCLIPath(parms)
+      // eslint-disable-next-line no-shadow
     } catch (error) {
       if (error instanceof Error) {
         core.debug(`${error.message}`)
@@ -23,6 +41,7 @@ async function run(): Promise<void> {
 
     try {
       await execISPWSync(clipath, parms, curWk)
+      // eslint-disable-next-line no-shadow
     } catch (error) {
       if (error instanceof Error) {
         core.debug(`${error.message}`)
@@ -79,6 +98,7 @@ async function run(): Promise<void> {
           `Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`
         )
       }
+      // eslint-disable-next-line no-shadow
     } catch (error) {
       if (error instanceof Error) {
         core.info(`Failed to read file: automaticBuildParams.txt`)
@@ -92,6 +112,7 @@ async function run(): Promise<void> {
         const dataStr = readFileSync(changedProgs).toString('utf8')
         core.setOutput('changedProgramsJson', dataStr)
       }
+      // eslint-disable-next-line no-shadow
     } catch (error) {
       if (error instanceof Error) {
         core.info(`Fail to read file: changedPrograms.json`)
@@ -100,6 +121,7 @@ async function run(): Promise<void> {
     }
 
     core.info('ISPW Sync action is completed')
+    // eslint-disable-next-line no-shadow
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
