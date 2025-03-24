@@ -73,7 +73,7 @@ export async function execISPWSync(
 
       // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
       if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
-        throw new Error('Potential path traversal detected!')
+        throw new Error('Invalid path!')
       }
 
       // Resolve the workspace to an absolute and canonical path to prevent directory traversal
