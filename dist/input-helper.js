@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkForHarmfulCharAndWords = exports.validatePath = exports.getInputs = void 0;
+exports.validateInputs = exports.checkForHarmfulCharAndWords = exports.validatePath = exports.getInputs = void 0;
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const path = __importStar(require("path"));
@@ -267,4 +267,59 @@ function checkForHarmfulCharAndWords(input) {
     return true; // No harmful characters or words found
 }
 exports.checkForHarmfulCharAndWords = checkForHarmfulCharAndWords;
+function validateInputs(input) {
+    // Validate all string parameters (path safety)
+    const stringParams = [
+        input.host,
+        input.encryptionProtocol,
+        input.codePage,
+        input.runtimeConfiguration,
+        input.stream,
+        input.application,
+        input.subAppl,
+        input.checkoutLevel,
+        input.gitRepoUrl,
+        input.containerCreation,
+        input.containerDescription,
+        input.gitBranch,
+        input.gitCommit,
+        input.ispwConfigPath,
+        input.assignmentPrefix,
+        input.gitFromHash,
+        input.gitCommitFile,
+        input.gitLocalPath
+    ];
+    for (const param of stringParams) {
+        if (typeof param !== 'string')
+            return false;
+        // Normalize and check for path traversal
+        const normalizedPath = path.normalize(param).replace(/\\/g, '/');
+        if (normalizedPath.includes('..')) {
+            // eslint-disable-next-line no-console
+            console.error(`Invalid path in parameter: ${param}`);
+            return false;
+        }
+        // Remove potentially dangerous characters
+        const sanitizedPath = normalizedPath.replace(/[^a-zA-Z0-9_\-/.]/g, '');
+        if (sanitizedPath !== normalizedPath) {
+            // eslint-disable-next-line no-console
+            console.error(`Unsafe characters detected in parameter: ${param}`);
+            return false;
+        }
+    }
+    // Validate all numeric parameters
+    const numberParams = [input.port, input.timeout];
+    for (const param of numberParams) {
+        if (typeof param !== 'number' || isNaN(param) || param < 0) {
+            // eslint-disable-next-line no-console
+            console.error(`Invalid number detected: ${param}`);
+            return false;
+        }
+    }
+    if (typeof input.showEnv != 'boolean') {
+        return false;
+    }
+    return true;
+}
+exports.validateInputs = validateInputs;
 //# sourceMappingURL=input-helper.js.map

@@ -328,7 +328,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkForHarmfulCharAndWords = exports.validatePath = exports.getInputs = void 0;
+exports.validateInputs = exports.checkForHarmfulCharAndWords = exports.validatePath = exports.getInputs = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const path = __importStar(__nccwpck_require__(1017));
@@ -567,6 +567,61 @@ function checkForHarmfulCharAndWords(input) {
     return true; // No harmful characters or words found
 }
 exports.checkForHarmfulCharAndWords = checkForHarmfulCharAndWords;
+function validateInputs(input) {
+    // Validate all string parameters (path safety)
+    const stringParams = [
+        input.host,
+        input.encryptionProtocol,
+        input.codePage,
+        input.runtimeConfiguration,
+        input.stream,
+        input.application,
+        input.subAppl,
+        input.checkoutLevel,
+        input.gitRepoUrl,
+        input.containerCreation,
+        input.containerDescription,
+        input.gitBranch,
+        input.gitCommit,
+        input.ispwConfigPath,
+        input.assignmentPrefix,
+        input.gitFromHash,
+        input.gitCommitFile,
+        input.gitLocalPath
+    ];
+    for (const param of stringParams) {
+        if (typeof param !== 'string')
+            return false;
+        // Normalize and check for path traversal
+        const normalizedPath = path.normalize(param).replace(/\\/g, '/');
+        if (normalizedPath.includes('..')) {
+            // eslint-disable-next-line no-console
+            console.error(`Invalid path in parameter: ${param}`);
+            return false;
+        }
+        // Remove potentially dangerous characters
+        const sanitizedPath = normalizedPath.replace(/[^a-zA-Z0-9_\-/.]/g, '');
+        if (sanitizedPath !== normalizedPath) {
+            // eslint-disable-next-line no-console
+            console.error(`Unsafe characters detected in parameter: ${param}`);
+            return false;
+        }
+    }
+    // Validate all numeric parameters
+    const numberParams = [input.port, input.timeout];
+    for (const param of numberParams) {
+        if (typeof param !== 'number' || isNaN(param) || param < 0) {
+            // eslint-disable-next-line no-console
+            console.error(`Invalid number detected: ${param}`);
+            return false;
+        }
+    }
+    if (typeof input.showEnv != 'boolean') {
+        return false;
+    }
+    return true;
+}
+exports.validateInputs = validateInputs;
 //# sourceMappingURL=input-helper.js.map
 
 /***/ }),
@@ -659,6 +714,15 @@ function execISPWSync(cliPath, parms, cwd) {
                 throw new Error(`Fail to get input values or environment settings`);
             }
             if (input_helper_1.checkForHarmfulCharAndWords(parms.workspace)) {
+                // Normalize and resolve the workspace path to ensure it's absolute and sanitized
+                const resolvedWorkspace = path.resolve(path.normalize(parms.workspace));
+                // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
+                const baseWorkspace = path.resolve(path.normalize(process.env.GITHUB_WORKSPACE || ''));
+                const relativePath = path.relative(baseWorkspace, resolvedWorkspace);
+                // If relativePath starts with '..', it means resolvedWorkspace is outside the base directory
+                if (relativePath.startsWith('..') || path.isAbsolute(relativePath)) {
+                    throw new Error('Invalid path!');
+                }
                 // Resolve the workspace to an absolute and canonical path to prevent directory traversal
                 const curWorkspace = fs.realpathSync(path.resolve(parms.workspace));
                 // Define paths
@@ -950,9 +1014,20 @@ function run() {
         try {
             const curWk = process.env.GITHUB_WORKSPACE;
             const parms = input_helper_1.getInputs();
+            try {
+                input_helper_1.validateInputs(parms);
+                // eslint-disable-next-line no-shadow
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    core.debug(`${error.message}`);
+                    throw error;
+                }
+            }
             let clipath = '';
             try {
                 clipath = yield ispw_command_helper_1.getISPWCLIPath(parms);
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -962,6 +1037,7 @@ function run() {
             }
             try {
                 yield ispw_command_helper_1.execISPWSync(clipath, parms, curWk);
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -1001,6 +1077,7 @@ function run() {
                 else {
                     throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);
                 }
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -1014,6 +1091,7 @@ function run() {
                     const dataStr = fs_1.readFileSync(changedProgs).toString('utf8');
                     core.setOutput('changedProgramsJson', dataStr);
                 }
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -1022,6 +1100,7 @@ function run() {
                 }
             }
             core.info('ISPW Sync action is completed');
+            // eslint-disable-next-line no-shadow
         }
         catch (error) {
             if (error instanceof Error) {
