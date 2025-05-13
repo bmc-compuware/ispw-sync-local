@@ -300,21 +300,8 @@ export function validateInputs(input: IISPWSyncParms): boolean {
   for (const param of stringParams) {
     if (typeof param !== 'string') return false
 
-    // Normalize and check for path traversal
-    const normalizedPath = path.normalize(param).replace(/\\/g, '/')
-    if (normalizedPath.includes('..')) {
-      // eslint-disable-next-line no-console
-      console.error(`Invalid path in parameter: ${param}`)
-      return false
-    }
+    if(!isSafeCommandInput(param)) return false
 
-    // Remove potentially dangerous characters
-    const sanitizedPath = normalizedPath.replace(/[^a-zA-Z0-9_\-/.]/g, '')
-    if (sanitizedPath !== normalizedPath) {
-      // eslint-disable-next-line no-console
-      console.error(`Unsafe characters detected in parameter: ${param}`)
-      return false
-    }
   }
 
   // Validate all numeric parameters
@@ -326,10 +313,35 @@ export function validateInputs(input: IISPWSyncParms): boolean {
       console.error(`Invalid number detected: ${param}`)
       return false
     }
+
+    if(!isSafeNumberInput(param)) return false
   }
 
   if (typeof input.showEnv != 'boolean') {
     return false
   }
+
   return true
+
+}
+
+function isSafeCommandInput(input: string): boolean {
+  //Allow only alphanumerics, space, underscore, dash
+  const safePattern = /^[a-zA-Z0-9 _-]+$/;
+
+  //Blacklist characters often used in injections
+  const dangerousPattern = /[;&|$`<>\\!()\[\]{}'"*?]/;
+
+  //Return true only if input matches safe pattern
+  return safePattern.test(input) && !dangerousPattern.test(input);
+}
+
+function isSafeNumberInput(input: any): boolean {
+  //Check that the input is either a number or a numeric string
+  const isNumeric = typeof input === 'number' || /^[0-9]+$/.test(input);
+
+  //Prevent things like "123; rm -rf /"
+  const hasOnlyDigits = String(input).match(/^[0-9]+$/);
+
+  return isNumeric && !!hasOnlyDigits;
 }

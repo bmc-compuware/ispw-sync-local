@@ -39,9 +39,20 @@ function run() {
         try {
             const curWk = process.env.GITHUB_WORKSPACE;
             const parms = input_helper_1.getInputs();
+            try {
+                input_helper_1.validateInputs(parms);
+                // eslint-disable-next-line no-shadow
+            }
+            catch (error) {
+                if (error instanceof Error) {
+                    core.debug(`${error.message}`);
+                    throw error;
+                }
+            }
             let clipath = '';
             try {
                 clipath = yield ispw_command_helper_1.getISPWCLIPath(parms);
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -51,6 +62,7 @@ function run() {
             }
             try {
                 yield ispw_command_helper_1.execISPWSync(clipath, parms, curWk);
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -90,6 +102,7 @@ function run() {
                 else {
                     throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);
                 }
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -103,6 +116,7 @@ function run() {
                     const dataStr = fs_1.readFileSync(changedProgs).toString('utf8');
                     core.setOutput('changedProgramsJson', dataStr);
                 }
+                // eslint-disable-next-line no-shadow
             }
             catch (error) {
                 if (error instanceof Error) {
@@ -111,6 +125,7 @@ function run() {
                 }
             }
             core.info('ISPW Sync action is completed');
+            // eslint-disable-next-line no-shadow
         }
         catch (error) {
             if (error instanceof Error) {
