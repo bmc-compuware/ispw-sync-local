@@ -239,13 +239,13 @@ export async function validatePath(aPath: string): Promise<void> {
 }
 
 /**
- * Function that checks if the input string contains the word 'safe'.
+ * Function that checks if the input string is safe (contains only allowed characters and no harmful words).
  * @param input The string to check
- * @returns { boolean } Returns true if 'safe' is found in the input string, otherwise false.
+ * @returns { boolean } Returns true if the input is safe, false if harmful content is detected.
  */
 export function checkForHarmfulCharAndWords(input: string): boolean {
   // eslint-disable-next-line no-useless-escape
-  const harmfulCharsRegex = /^[a-zA-Z0-9_\-\.\/\\]+$/g
+  const safeCharsRegex = /^[a-zA-Z0-9_\-\.\/\\:]+$/g
 
   const harmfulWords = [
     'config',
@@ -254,13 +254,12 @@ export function checkForHarmfulCharAndWords(input: string): boolean {
     'password',
     'admin',
     'backup',
-    'restricted',
-    'bin'
+    'restricted'
   ]
 
-  // Check for harmful characters using the regex
-  if (harmfulCharsRegex.test(input)) {
-    return false // Harmful character found
+  // Check if input contains only safe characters using the regex
+  if (!safeCharsRegex.test(input)) {
+    return false // Unsafe character found
   }
 
   // Check for harmful words in the input string
