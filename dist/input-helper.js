@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -11,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -28,7 +42,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateInputs = exports.checkForHarmfulCharAndWords = exports.validatePath = exports.getInputs = void 0;
+exports.getInputs = getInputs;
+exports.validatePath = validatePath;
+exports.checkForHarmfulCharAndWords = checkForHarmfulCharAndWords;
+exports.validateInputs = validateInputs;
 const core = __importStar(require("@actions/core"));
 const github = __importStar(require("@actions/github"));
 const path = __importStar(require("path"));
@@ -220,7 +237,6 @@ function getInputs() {
     }
     return result;
 }
-exports.getInputs = getInputs;
 function validatePath(aPath) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -234,15 +250,14 @@ function validatePath(aPath) {
         }
     });
 }
-exports.validatePath = validatePath;
 /**
- * Function that checks if the input string contains the word 'safe'.
+ * Function that checks if the input string is safe (contains only allowed characters and no harmful words).
  * @param input The string to check
- * @returns { boolean } Returns true if 'safe' is found in the input string, otherwise false.
+ * @returns { boolean } Returns true if the input is safe, false if harmful content is detected.
  */
 function checkForHarmfulCharAndWords(input) {
     // eslint-disable-next-line no-useless-escape
-    const harmfulCharsRegex = /^[a-zA-Z0-9_\-\.\/\\]+$/g;
+    const safeCharsRegex = /^[a-zA-Z0-9_\-\.\/\\:]+$/g;
     const harmfulWords = [
         'config',
         'bin',
@@ -250,12 +265,11 @@ function checkForHarmfulCharAndWords(input) {
         'password',
         'admin',
         'backup',
-        'restricted',
-        'bin'
+        'restricted'
     ];
-    // Check for harmful characters using the regex
-    if (harmfulCharsRegex.test(input)) {
-        return false; // Harmful character found
+    // Check if input contains only safe characters using the regex
+    if (!safeCharsRegex.test(input)) {
+        return false; // Unsafe character found
     }
     // Check for harmful words in the input string
     const inputLowerCase = input.toLowerCase(); // Convert the input to lowercase for case-insensitive comparison
@@ -266,7 +280,6 @@ function checkForHarmfulCharAndWords(input) {
     }
     return true; // No harmful characters or words found
 }
-exports.checkForHarmfulCharAndWords = checkForHarmfulCharAndWords;
 function validateInputs(input) {
     // Validate all string parameters (path safety)
     const stringParams = [
@@ -292,20 +305,8 @@ function validateInputs(input) {
     for (const param of stringParams) {
         if (typeof param !== 'string')
             return false;
-        // Normalize and check for path traversal
-        const normalizedPath = path.normalize(param).replace(/\\/g, '/');
-        if (normalizedPath.includes('..')) {
-            // eslint-disable-next-line no-console
-            console.error(`Invalid path in parameter: ${param}`);
+        if (!isSafeCommandInput(param))
             return false;
-        }
-        // Remove potentially dangerous characters
-        const sanitizedPath = normalizedPath.replace(/[^a-zA-Z0-9_\-/.]/g, '');
-        if (sanitizedPath !== normalizedPath) {
-            // eslint-disable-next-line no-console
-            console.error(`Unsafe characters detected in parameter: ${param}`);
-            return false;
-        }
     }
     // Validate all numeric parameters
     const numberParams = [input.port, input.timeout];
@@ -315,11 +316,27 @@ function validateInputs(input) {
             console.error(`Invalid number detected: ${param}`);
             return false;
         }
+        if (!isSafeNumberInput(param))
+            return false;
     }
     if (typeof input.showEnv != 'boolean') {
         return false;
     }
     return true;
 }
-exports.validateInputs = validateInputs;
+function isSafeCommandInput(input) {
+    //Allow only alphanumerics, space, underscore, dash
+    const safePattern = /^[a-zA-Z0-9 _-]+$/;
+    //Blacklist characters often used in injections
+    const dangerousPattern = /[;&|$`<>\\!()\[\]{}'"*?]/;
+    //Return true only if input matches safe pattern
+    return safePattern.test(input) && !dangerousPattern.test(input);
+}
+function isSafeNumberInput(input) {
+    //Check that the input is either a number or a numeric string
+    const isNumeric = typeof input === 'number' || /^[0-9]+$/.test(input);
+    //Prevent things like "123; rm -rf /"
+    const hasOnlyDigits = String(input).match(/^[0-9]+$/);
+    return isNumeric && !!hasOnlyDigits;
+}
 //# sourceMappingURL=input-helper.js.map

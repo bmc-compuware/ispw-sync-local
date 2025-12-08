@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -11,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -28,7 +42,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.quoteArg = exports.execISPWSync = exports.getISPWCLIPath = void 0;
+exports.getISPWCLIPath = getISPWCLIPath;
+exports.execISPWSync = execISPWSync;
+exports.quoteArg = quoteArg;
 const core = __importStar(require("@actions/core"));
 const exec_1 = require("@actions/exec");
 const io = __importStar(require("@actions/io"));
@@ -47,7 +63,7 @@ function getISPWCLIPath(parms) {
                 topazCLIPath = path.join(topazCLIPath, 'IspwCLI.bat');
                 topazCLIPath = path.normalize(topazCLIPath);
                 core.debug(`Workbench CLI Path: '${topazCLIPath}'`);
-                if (fs_1.existsSync(topazCLIPath)) {
+                if ((0, fs_1.existsSync)(topazCLIPath)) {
                     return topazCLIPath;
                 }
                 else {
@@ -60,7 +76,7 @@ function getISPWCLIPath(parms) {
                 topazCLIPath = path.join(topazCLIPath, 'IspwCLI.sh');
                 topazCLIPath = path.normalize(topazCLIPath);
                 core.debug(`Workbench CLI Path: ${topazCLIPath}`);
-                if (fs_1.existsSync(topazCLIPath)) {
+                if ((0, fs_1.existsSync)(topazCLIPath)) {
                     return topazCLIPath;
                 }
                 else {
@@ -72,7 +88,6 @@ function getISPWCLIPath(parms) {
         }
     });
 }
-exports.getISPWCLIPath = getISPWCLIPath;
 function execISPWSync(cliPath, parms, cwd) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -81,7 +96,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 core.debug('Fail to get input values or environment settings');
                 throw new Error(`Fail to get input values or environment settings`);
             }
-            if (input_helper_1.checkForHarmfulCharAndWords(parms.workspace)) {
+            if ((0, input_helper_1.checkForHarmfulCharAndWords)(parms.workspace)) {
                 // Normalize and resolve the workspace path to ensure it's absolute and sanitized
                 const resolvedWorkspace = path.resolve(path.normalize(parms.workspace));
                 // Ensure the resolvedWorkspace is within the allowed base directory (GITHUB_WORKSPACE)
@@ -105,7 +120,7 @@ function execISPWSync(cliPath, parms, cwd) {
                     return realPath.startsWith(curWorkspace);
                 };
                 // Check and create directory if it does not exist
-                if (!fs_1.existsSync(configPath)) {
+                if (!(0, fs_1.existsSync)(configPath)) {
                     yield io.mkdirP(configPath);
                     core.info(`Directory created: ${configPath}`);
                 }
@@ -113,11 +128,11 @@ function execISPWSync(cliPath, parms, cwd) {
                     core.info(`Directory exists: ${configPath}`);
                 }
                 // Check and remove changedPrograms file
-                if (fs_1.existsSync(changedPrograms)) {
+                if ((0, fs_1.existsSync)(changedPrograms)) {
                     if (isPathWithinWorkspace(changedPrograms)) {
                         core.info(`Check file: ${changedPrograms}`);
                         try {
-                            fs_1.unlinkSync(changedPrograms);
+                            (0, fs_1.unlinkSync)(changedPrograms);
                             core.info(`Removed obsolete file: ${changedPrograms}`);
                         }
                         catch (error) {
@@ -135,11 +150,11 @@ function execISPWSync(cliPath, parms, cwd) {
                     core.info(`File does not exist: ${changedPrograms}`);
                 }
                 // Check and remove autoBuildParms file
-                if (fs_1.existsSync(autoBuildParms)) {
+                if ((0, fs_1.existsSync)(autoBuildParms)) {
                     if (isPathWithinWorkspace(autoBuildParms)) {
                         core.info(`Check file: ${autoBuildParms}`);
                         try {
-                            fs_1.unlinkSync(autoBuildParms);
+                            (0, fs_1.unlinkSync)(autoBuildParms);
                             core.info(`Removed obsolete file: ${autoBuildParms}`);
                         }
                         catch (error) {
@@ -157,11 +172,11 @@ function execISPWSync(cliPath, parms, cwd) {
                     core.info(`File does not exist: ${autoBuildParms}`);
                 }
                 // Check and remove tempHash file
-                if (fs_1.existsSync(tempHash)) {
+                if ((0, fs_1.existsSync)(tempHash)) {
                     if (isPathWithinWorkspace(tempHash)) {
                         core.info(`Check file: ${tempHash}`);
                         try {
-                            fs_1.unlinkSync(tempHash);
+                            (0, fs_1.unlinkSync)(tempHash);
                             core.info(`Removed obsolete file: ${tempHash}`);
                         }
                         catch (error) {
@@ -191,7 +206,7 @@ function execISPWSync(cliPath, parms, cwd) {
                     changedFileList = yield gitCommand.calculateDiff('git', parms.gitCommit, curWorkspace);
                 }
                 else {
-                    changedFileList = yield github_restapi_helper_1.calculateChangedFiles(parms);
+                    changedFileList = yield (0, github_restapi_helper_1.calculateChangedFiles)(parms);
                 }
                 if (!changedFileList || changedFileList.length <= 1) {
                     core.info('There is no changed files found.');
@@ -199,7 +214,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 }
                 else {
                     if (changedFileList.length > 2048) {
-                        const writeStream = fs_1.createWriteStream(tempHash);
+                        const writeStream = (0, fs_1.createWriteStream)(tempHash);
                         writeStream.write(changedFileList);
                         writeStream.end();
                     }
@@ -298,7 +313,7 @@ function execISPWSync(cliPath, parms, cwd) {
                 cwd = quoteArg(true, cwd);
                 cliPath = quoteArg(true, cliPath);
                 core.debug(`Code Pipeline CLI parms: ${parms}`);
-                yield exec_1.exec(cliPath, args, { cwd });
+                yield (0, exec_1.exec)(cliPath, args, { cwd });
             }
             else {
                 throw new Error(`Invalid path: The path contains disallowed characters or Harmful words. Please check workspace directory path`);
@@ -311,7 +326,6 @@ function execISPWSync(cliPath, parms, cwd) {
         }
     });
 }
-exports.execISPWSync = execISPWSync;
 function quoteArg(escape, arg) {
     if (!arg) {
         return '';
@@ -332,5 +346,4 @@ function quoteArg(escape, arg) {
     }
     return arg;
 }
-exports.quoteArg = quoteArg;
 //# sourceMappingURL=ispw-command-helper.js.map

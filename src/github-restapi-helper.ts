@@ -83,7 +83,7 @@ export async function calculateChangedFiles(
   }
 
   core.info('Calling GitHub API to calculate changed files')
-  const response = await octokit.repos.compareCommits(options)
+  const response = await octokit.rest.repos.compareCommits(options)
   core.debug(JSON.stringify(response))
 
   if (!response || !response.data) {
@@ -95,7 +95,7 @@ export async function calculateChangedFiles(
 
   if (files) {
     let fileNameStr = ''
-    const fileNames = files.map(f => f.filename.concat(':'))
+    const fileNames = files.map((f: any) => f.filename.concat(':'))
 
     if (fileNames) {
       for (const afile of fileNames) {

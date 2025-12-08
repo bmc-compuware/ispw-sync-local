@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -11,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -28,13 +42,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.calculateDiff = exports.getGitPath = void 0;
+exports.getGitPath = getGitPath;
+exports.calculateDiff = calculateDiff;
 const core = __importStar(require("@actions/core"));
 const exec = __importStar(require("@actions/exec"));
 const io = __importStar(require("@actions/io"));
 const github = __importStar(require("@actions/github"));
-function execGit(gitPath, args, allowAllExitCodes = false, wkspace, silent = false) {
-    return __awaiter(this, void 0, void 0, function* () {
+function execGit(gitPath_1, args_1) {
+    return __awaiter(this, arguments, void 0, function* (gitPath, args, allowAllExitCodes = false, wkspace, silent = false) {
         const result = new GitCommandOutput();
         const env = {};
         const stdout = [];
@@ -81,7 +96,6 @@ function getGitPath() {
         }
     });
 }
-exports.getGitPath = getGitPath;
 function calculateDiff(gitPath, commitid, wkspace) {
     return __awaiter(this, void 0, void 0, function* () {
         const context = github.context;
@@ -158,5 +172,4 @@ function calculateDiff(gitPath, commitid, wkspace) {
         throw new Error('Unexpected error when calculcating the changed files');
     });
 }
-exports.calculateDiff = calculateDiff;
 //# sourceMappingURL=git-command-helper.js.map
