@@ -299,8 +299,7 @@ export function validateInputs(input: IISPWSyncParms): boolean {
   for (const param of stringParams) {
     if (typeof param !== 'string') return false
 
-    if(!isSafeCommandInput(param)) return false
-
+    if (!isSafeCommandInput(param)) return false
   }
 
   // Validate all numeric parameters
@@ -313,7 +312,7 @@ export function validateInputs(input: IISPWSyncParms): boolean {
       return false
     }
 
-    if(!isSafeNumberInput(param)) return false
+    if (!isSafeNumberInput(param)) return false
   }
 
   if (typeof input.showEnv != 'boolean') {
@@ -321,26 +320,25 @@ export function validateInputs(input: IISPWSyncParms): boolean {
   }
 
   return true
-
 }
 
 function isSafeCommandInput(input: string): boolean {
   //Allow only alphanumerics, space, underscore, dash
-  const safePattern = /^[a-zA-Z0-9 _-]+$/;
+  const safePattern = /^[a-zA-Z0-9 _-]+$/
 
   //Blacklist characters often used in injections
-  const dangerousPattern = /[;&|$`<>\\!()\[\]{}'"*?]/;
+  const dangerousPattern = /[;&|$`<>\\!()\[\]{}'"*?]/
 
   //Return true only if input matches safe pattern
-  return safePattern.test(input) && !dangerousPattern.test(input);
+  return safePattern.test(input) && !dangerousPattern.test(input)
 }
 
 function isSafeNumberInput(input: any): boolean {
   //Check that the input is either a number or a numeric string
-  const isNumeric = typeof input === 'number' || /^[0-9]+$/.test(input);
+  const isNumeric = typeof input === 'number' || /^[0-9]+$/.test(input)
 
   //Prevent things like "123; rm -rf /"
-  const hasOnlyDigits = String(input).match(/^[0-9]+$/);
+  const hasOnlyDigits = String(input).match(/^[0-9]+$/)
 
-  return isNumeric && !!hasOnlyDigits;
+  return isNumeric && !!hasOnlyDigits
 }
