@@ -239,10 +239,6 @@ function execISPWSync(cliPath, parms, cwd) {
                     parms.checkoutLevel,
                     '-gitRepoUrl',
                     parms.gitRepoUrl,
-                    '-gitUsername',
-                    parms.gitUid,
-                    '-gitPassword',
-                    parms.gitToken,
                     '-gitBranch',
                     parms.gitBranch,
                     '-gitFromHash',
@@ -254,6 +250,14 @@ function execISPWSync(cliPath, parms, cwd) {
                     '-gitLocalPath',
                     parms.gitLocalPath
                 ];
+                if (parms.gitUid) {
+                    args.push('-gitUsername');
+                    args.push(parms.gitUid);
+                }
+                if (parms.gitToken) {
+                    args.push('-gitPassword');
+                    args.push(parms.gitToken);
+                }
                 if (parms.subAppl) {
                     args.push('-ispwServerSubAppl');
                     args.push(parms.subAppl);
