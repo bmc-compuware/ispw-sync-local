@@ -218,10 +218,6 @@ export async function execISPWSync(
         parms.checkoutLevel,
         '-gitRepoUrl',
         parms.gitRepoUrl,
-        '-gitUsername',
-        parms.gitUid,
-        '-gitPassword',
-        parms.gitToken,
         '-gitBranch',
         parms.gitBranch,
         '-gitFromHash',
@@ -233,6 +229,16 @@ export async function execISPWSync(
         '-gitLocalPath',
         parms.gitLocalPath
       ]
+
+      if (parms.gitUid) {
+        args.push('-gitUsername')
+        args.push(parms.gitUid)
+      }
+
+      if (parms.gitToken) {
+        args.push('-gitPassword')
+        args.push(parms.gitToken)
+      }
 
       if (parms.subAppl) {
         args.push('-ispwServerSubAppl')

@@ -53,10 +53,10 @@ inputs:
     default: 'DEV1'
   gitUid:
     description: 'GitHub user ID'
-    required: true
+    required: false
   gitToken:
     description: 'GitHub token, PAT,  or password when not using GitHub API to calculate the changed files'
-    required: true
+    required: false
   containerCreation:
     description: 'The option to indicate how often to create a new Code Pipeline container'
     required: false

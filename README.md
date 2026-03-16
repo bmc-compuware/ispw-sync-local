@@ -22,7 +22,7 @@ This action will load changed components into Code Pipeline on the mainframe fro
     name: Code Pipeline Sync on self-hosted runners
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: Synchronize
@@ -30,15 +30,14 @@ This action will load changed components into Code Pipeline on the mainframe fro
         id: sync-local
         with:
           host: 'host.example.com'
-          port: 47623
+          port: 12345
           uid: 'ISPWUSER'
-          pass: ${{ secrets.ISPW_USER1_PWD }}
-          runtimeConfiguration: 'TPZP'
+          pass: ${{ secrets.ISPW_USER_PWD }}
+          runtimeConfiguration: 'TPTP'
           stream: 'PLAY'
           application: 'PLAY'
+          subAppl: 'PLAY'
           checkoutLevel: 'DEV2'
-          gitUid: 'GitUserId'
-          gitToken: ${{ secrets.GITHUB_TOKEN }}
           winTopazPath: ${{ Topaz_Location }}
           showEnv: true
 
@@ -61,8 +60,8 @@ This action will load changed components into Code Pipeline on the mainframe fro
 | `application` | **Required** | The Code Pipeline server application. For example, `"PLAY"` |
 | `subAppl` | **Optional** | The Code Pipeline server sub application. For example, `"PLAY"` |
 | `checkoutLevel` | **Required** | The Code Pipeline server level. For example, `"DEV1"` |
-| `gitUid` | **Required** | The user name for the GIT repository. For example, `"gitfoo"` |
-| `gitToken` | **Required** | GitHub token, PAT, or password when not using GitHub API to calculate the changed files. Please use secrets, such as,  `${{ secrets.GITHUB_TOKEN }}` |
+| `gitUid` | **Optional** | The username for the GIT repository. For example, `"gitfoo"`. Note: This parameter should be used only if Git is not available on the runner. Used by GitHub API to determine changed files |
+| `gitToken` | **Optional** | The password for the GIT repository. Make sure to use GitHub Secrets, such as ${{ secrets.GITHUB_TOKEN }}, for secure access. Note: This parameter should be used only if Git is not available on the runner. Used by GitHub API to determine changed files|
 | `containerCreation` | **Optional** | The option to indicate how often to create a new Code Pipeline container (per-commit, per-branch). Default, `"per-commit"` |
 | `containerDescription` | **Optional** | The custom description to be used for the Code Pipeline container. |
 | `winTopazPath` |  **Optional** | Workbench CLI installed path on Window based self-hosted runner. |

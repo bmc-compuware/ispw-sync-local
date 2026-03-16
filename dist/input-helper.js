@@ -104,8 +104,8 @@ function getInputs() {
         gitLocalPath = githubWorkspacePath;
     }
     result.gitLocalPath = gitLocalPath;
-    result.gitUid = core.getInput('gitUid', { required: true });
-    result.gitToken = core.getInput('gitToken', { required: true });
+    result.gitUid = core.getInput('gitUid', { required: false });
+    result.gitToken = core.getInput('gitToken', { required: false });
     let repoUrl = process.env['GITHUB_REPOSITORY'];
     const repoServer = process.env['GITHUB_SERVER_URL'];
     if (!repoServer) {

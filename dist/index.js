@@ -430,8 +430,8 @@ function getInputs() {
         gitLocalPath = githubWorkspacePath;
     }
     result.gitLocalPath = gitLocalPath;
-    result.gitUid = core.getInput('gitUid', { required: true });
-    result.gitToken = core.getInput('gitToken', { required: true });
+    result.gitUid = core.getInput('gitUid', { required: false });
+    result.gitToken = core.getInput('gitToken', { required: false });
     let repoUrl = process.env['GITHUB_REPOSITORY'];
     const repoServer = process.env['GITHUB_SERVER_URL'];
     if (!repoServer) {
@@ -914,10 +914,6 @@ function execISPWSync(cliPath, parms, cwd) {
                     parms.checkoutLevel,
                     '-gitRepoUrl',
                     parms.gitRepoUrl,
-                    '-gitUsername',
-                    parms.gitUid,
-                    '-gitPassword',
-                    parms.gitToken,
                     '-gitBranch',
                     parms.gitBranch,
                     '-gitFromHash',
@@ -929,6 +925,14 @@ function execISPWSync(cliPath, parms, cwd) {
                     '-gitLocalPath',
                     parms.gitLocalPath
                 ];
+                if (parms.gitUid) {
+                    args.push('-gitUsername');
+                    args.push(parms.gitUid);
+                }
+                if (parms.gitToken) {
+                    args.push('-gitPassword');
+                    args.push(parms.gitToken);
+                }
                 if (parms.subAppl) {
                     args.push('-ispwServerSubAppl');
                     args.push(parms.subAppl);
